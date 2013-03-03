@@ -60,9 +60,11 @@ closure_tree has some great features:</p>
 
 <ul>
 <li>Fetch your whole ancestor lineage in 1 SELECT.</li>
-<li>Grab all your descendants: 1 SELECT.</li>
-<li>Get all your siblings: 1 SELECT.</li>
-<li>Fetch all <a href="#nested-hashes">7-degrees-of-bacon in a nested hash</a>: 1 SELECT.</li>
+<li>Grab all your descendants in 1 SELECT.</li>
+<li>Get all your siblings in 1 SELECT.</li>
+<li>Fetch all <a href="#nested-hashes">7-degrees-of-bacon in a nested hash</a> in 1 SELECT.</li>
+<li>
+<a href="#find_or_create_by_path">Find a node by path</a> in 1 SELECT.</li>
 </ul>
 </li>
 <li>
@@ -526,7 +528,11 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>3.8.1</h3>
+<h3>3.8.2</h3>
+
+<ul>
+<li>find_by_path uses 1 SELECT now. BOOM.</li>
+</ul><h3>3.8.1</h3>
 
 <ul>
 <li>Double-check locking for find_or_create_by_path</li>
