@@ -377,6 +377,25 @@ server may not be happy trying to do this.</p>
 <span class="k">class</span> <span class="nc">WhatTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
 </pre></div>
 
+<p>Please note that Rails (&lt;= 3.2) doesn't handle polymorphic associations correctly if
+you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:</p>
+
+<div class="highlight"><pre><span class="c1"># BAD: ActiveRecord ignores the :type attribute:</span>
+<span class="n">root</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"child"</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s2">"WhenTag"</span><span class="p">)</span>
+</pre></div>
+
+<p>Instead, use either <code>.add_child</code> or <code>children &lt;&lt;</code>:</p>
+
+<div class="highlight"><pre><span class="c1"># GOOD!</span>
+<span class="n">a</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"a"</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="no">WhenTag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"b"</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">b</span>
+<span class="n">c</span> <span class="o">=</span> <span class="no">WhatTag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"c"</span><span class="p">)</span>
+<span class="n">b</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+
+<p>See <a href="https://github.com/mceachen/closure_tree/issues/43">issue 43</a> for more information.</p>
+
 <h2>Deterministic ordering</h2>
 
 <p>By default, children will be ordered by your database engine, which may not be what you want.</p>
