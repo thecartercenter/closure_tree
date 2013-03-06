@@ -62,9 +62,9 @@ closure_tree has some great features:</p>
 <li>Fetch your whole ancestor lineage in 1 SELECT.</li>
 <li>Grab all your descendants in 1 SELECT.</li>
 <li>Get all your siblings in 1 SELECT.</li>
-<li>Fetch all <a href="#nested-hashes">7-degrees-of-bacon in a nested hash</a> in 1 SELECT.</li>
+<li>Fetch all <a href="#nested-hashes">descendants as a nested hash</a> in 1 SELECT.</li>
 <li>
-<a href="#find_or_create_by_path">Find a node by path</a> in 1 SELECT.</li>
+<a href="#find_or_create_by_path">Find a node by ancestry path</a> in 1 SELECT.</li>
 </ul>
 </li>
 <li>
@@ -83,8 +83,6 @@ closure_tree has some great features:</p>
 </li>
 <li>Support for <a href="#deterministic-ordering">deterministic ordering</a> of children</li>
 <li>Support for <a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">preordered</a> traversal of descendants</li>
-<li>Support for single-select depth-limited <a href="#nested-hashes">nested hashes</a>
-</li>
 <li>Excellent <a href="#testing">test coverage</a> in a variety of environments</li>
 </ul><p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
 <a href="http://www.slideshare.net/billkarwin/models-for-hierarchical-data">Models for hierarchical data presentation</a>
@@ -114,7 +112,7 @@ for a description of different tree storage algorithms.</p>
 <p>Add a migration to add a <code>parent_id</code> column to the model you want to act_as_tree.
 You may want to also <a href="#sort_order">add a column for deterministic ordering of children</a>, but that's optional.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
   <span class="k">def</span> <span class="nf">change</span>
     <span class="n">add_column</span> <span class="ss">:tag</span><span class="p">,</span> <span class="ss">:parent_id</span><span class="p">,</span> <span class="ss">:integer</span>
   <span class="k">end</span>
@@ -129,7 +127,7 @@ default the table name will be the model's table name, followed by
 "_hierarchies". Note that by calling <code>acts_as_tree</code>, a "virtual model" (in this case, <code>TagHierarchy</code>)
 will be added automatically, so you don't need to create it.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">CreateTagHierarchies</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">CreateTagHierarchies</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
   <span class="k">def</span> <span class="nf">change</span>
     <span class="n">create_table</span> <span class="ss">:tag_hierarchies</span><span class="p">,</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
       <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:ancestor_id</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>   <span class="c1"># ID of the parent/grandparent/great-grandparent/... tag</span>
@@ -166,11 +164,6 @@ will be added automatically, so you don't need to create it.</p>
 <p>Child nodes are created by appending to the children collection:</p>
 
 <div class="highlight"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Parent'</span><span class="p">)</span>
-</pre></div>
-
-<p>Or by giving the parent to the constructor:</p>
-
-<div class="highlight"><pre><span class="n">child1</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'First Child'</span><span class="p">,</span> <span class="ss">:parent</span> <span class="o">=&gt;</span> <span class="n">parent</span><span class="p">)</span>
 </pre></div>
 
 <p>Or by appending to the children collection:</p>
@@ -328,6 +321,8 @@ server may not be happy trying to do this.</p>
 <li>
 <code>tag.children</code> is a <code>has_many</code> of immediate children (just those nodes whose parent is the current node).</li>
 <li>
+<code>tag.child_ids</code> is an array of the IDs of the children.</li>
+<li>
 <code>tag.ancestors</code> is a ordered scope of [ parent, grandparent, great grandparent, … ]. Note that the size of this array will always equal <code>tag.depth</code>.</li>
 <li>
 <code>tag.ancestor_ids</code> is an array of the IDs of the ancestors.</li>
@@ -374,7 +369,7 @@ server may not be happy trying to do this.</p>
 <ol>
 <li>Create a db migration that adds a String <code>type</code> column to your model</li>
 <li>Subclass the model class. You only need to add <code>acts_as_tree</code> to your base class:</li>
-</ol><div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</ol><div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
   <span class="n">acts_as_tree</span>
 <span class="k">end</span>
 <span class="k">class</span> <span class="nc">WhenTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
@@ -388,7 +383,7 @@ server may not be happy trying to do this.</p>
 
 <p>If you want to order children alphabetically, and your model has a <code>name</code> column, you'd do this:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
   <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'name'</span>
 <span class="k">end</span>
 </pre></div>
@@ -400,7 +395,7 @@ server may not be happy trying to do this.</p>
 
 <p>and in your model:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">OrderedTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">OrderedTag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
   <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'sort_order'</span>
 <span class="k">end</span>
 </pre></div>
@@ -527,6 +522,16 @@ run the test matrix locally.</p>
 <a href="https://github.com/rails/rails/issues/7538">known issue</a>.</p>
 
 <h2>Change log</h2>
+
+<h3>3.9.0</h3>
+
+<ul>
+<li>Added <code>.child_ids</code>.</li>
+<li>Removed <code>dependent =&gt; destroy</code> on the descendant_hierarchy and ancestor_hierarchy collections
+(they were a mistake).</li>
+<li>Clarified documentation for creation and child associations.
+Because <code>Tag.create!(:parent =&gt; ...)</code> requires a <code>.reload</code>, I removed it as an example.</li>
+</ul><p>All three of these improvements were suggested by Andrew Bromwich. Thanks!</p>
 
 <h3>3.8.2</h3>
 
