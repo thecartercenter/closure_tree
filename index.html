@@ -435,6 +435,8 @@ element in scope will be the sibling immediately "after" <code>self</code>
 </ul><p>If your <code>order</code> column is an integer attribute, you'll also have these:</p>
 
 <ul>
+<li><p>The class method <code>#roots_and_descendants_preordered</code>, which returns all nodes in your tree,
+<a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">pre-ordered</a>.</p></li>
 <li><p><code>node1.self_and_descendants_preordered</code> which will return descendants,
 <a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">pre-ordered</a>.</p></li>
 <li>
@@ -542,7 +544,12 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>3.9.0</h3>
+<h3>3.10.0</h3>
+
+<ul>
+<li>Added <code>#roots_and_descendants_preordered</code>.
+Thanks for the suggestion, <a href="https://github.com/leonelgalan">Leonel Galan</a>!</li>
+</ul><h3>3.9.0</h3>
 
 <ul>
 <li>Added <code>.child_ids</code>.</li>
