@@ -544,7 +544,17 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>3.10.0</h3>
+<h3>3.10.1</h3>
+
+<ul>
+<li><p>Multipart constant names like "Admin::PageHierarchy" are now supported.
+Resolves <a href="https://github.com/mceachen/closure_tree/issues/47">issue 47</a>.
+Thanks for the perfect pull request, <a href="https://github.com/fd">Simon Menke</a>!</p></li>
+<li><p>Committing transactions involving large numbers of hierarchy model classes was very slow due
+to hash collisions in the hierarchy class. A better hash implementation addressed
+<a href="https://github.com/mceachen/closure_tree/issues/48">issue 48</a>.
+Thanks, <a href="https://github.com/jturkel">Joel Turkel</a>!</p></li>
+</ul><h3>3.10.0</h3>
 
 <ul>
 <li>Added <code>#roots_and_descendants_preordered</code>.
