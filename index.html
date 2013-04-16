@@ -544,7 +544,16 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>3.10.1</h3>
+<h3>3.10.2</h3>
+
+<ul>
+<li><p>Prevent faulty SQL statement when <code>#siblings</code> is called on an unsaved records.
+Resolves <a href="https://github.com/mceachen/closure_tree/pull/52">issue 52</a>. Perfect pull
+request by <a href="https://github.com/garygreyling">Gary Greyling</a>.</p></li>
+<li><p>The <code>.roots</code> class method now correctly respects the <code>:order</code> option.
+Resolves <a href="https://github.com/mceachen/closure_tree/issues/53">issue 53</a>.
+Thanks for finding this, <a href="https://github.com/brendon">Brendon Muir</a>!</p></li>
+</ul><h3>3.10.1</h3>
 
 <ul>
 <li><p>Multipart constant names like "Admin::PageHierarchy" are now supported.
