@@ -544,7 +544,19 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>3.10.2</h3>
+<h3>4.0.0</h3>
+
+<ul>
+<li>
+<p>Moved all of closure_tree's implementation-detail methods into a <code>ClosureTree::Support</code>
+instance, which removes almost all of the namespace pollution in your models that wasn't
+for normal consumption. If you were using any of these methods, they're now available through
+the "_ct" class and instance member.</p>
+
+<p><em>This change may break consumers</em>, so I incremented the major version number, even though no new
+functionality was released.</p>
+</li>
+</ul><h3>3.10.2</h3>
 
 <ul>
 <li><p>Prevent faulty SQL statement when <code>#siblings</code> is called on an unsaved records.
