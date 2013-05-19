@@ -7,40 +7,38 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
+    <script src="javascripts/respond.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
   </head>
   <body>
-
-      <header>
-        <h1>Closure tree</h1>
-        <p>Easily and efficiently make your ActiveRecord model support hierarchies</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/mceachen/closure_tree" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/mceachen/closure_tree/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/mceachen/closure_tree/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/mceachen/closure_tree">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/mceachen/closure_tree/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/mceachen/closure_tree/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
     <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
+
       <section>
-        <h1>Closure Tree <a href="http://travis-ci.org/mceachen/closure_tree"><img src="https://secure.travis-ci.org/mceachen/closure_tree.png?branch=master" alt="Build Status"></a>
-</h1>
+        <div id="title">
+          <h1>Closure tree</h1>
+          <p>Easily and efficiently make your ActiveRecord model support hierarchies</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/mceachen">mceachen</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Closure Tree</h1>
 
 <h3>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
 </h3>
@@ -48,10 +46,13 @@
 <p>Common applications include modeling hierarchical data, like tags, page graphs in CMSes,
 and tracking user referrals.</p>
 
-<p>Mostly API-compatible with other popular nesting gems for Rails, like
-<a href="https://github.com/stefankroes/ancestry">ancestry</a>,
-<a href="https://github.com/amerine/acts_as_tree">acts_as_tree</a> and
-<a href="https://github.com/collectiveidea/awesome_nested_set/">awesome_nested_set</a>,
+<p><a href="http://travis-ci.org/mceachen/closure_tree"><img src="https://secure.travis-ci.org/mceachen/closure_tree.png?branch=master" alt="Build Status"></a>
+<a href="http://rubygems.org/gems/closure_tree"><img src="https://badge.fury.io/rb/closure_tree.png" alt="Gem Version"></a></p>
+
+<p>Substantially more efficient than
+<a href="https://github.com/stefankroes/ancestry">ancestry</a> and
+<a href="https://github.com/amerine/acts_as_tree">acts_as_tree</a>, and even more
+awesome than <a href="https://github.com/collectiveidea/awesome_nested_set/">awesome_nested_set</a>,
 closure_tree has some great features:</p>
 
 <ul>
@@ -147,8 +148,8 @@ will be added automatically, so you don't need to create it.</p>
 <li><p>Run <code>rake db:migrate</code></p></li>
 <li>
 <p>If you're migrating from another system where your model already has a
-<code>parent_id</code> column, run <code>Tag.rebuild!</code> and the
-…_hierarchy table will be truncated and rebuilt.</p>
+<code>parent_id</code> column, run <code>Tag.rebuild!</code> and your
+<code>tag_hierarchies</code> table will be truncated and rebuilt.</p>
 
 <p>If you're starting from scratch you don't need to call <code>rebuild!</code>.</p>
 </li>
@@ -544,7 +545,15 @@ run the test matrix locally.</p>
 
 <h2>Change log</h2>
 
-<h3>4.0.0</h3>
+<h3>4.0.1</h3>
+
+<ul>
+<li><p>Numeric, deterministically ordered siblings will always be <a href="previously,%20the%20sort%20order%20might%20use%20negative%20values,%20which%20broke%20the%20preordering">0..#{self_and_siblings.count}</a>.
+Resolves <a href="https://github.com/mceachen/closure_tree/issues/49">issue 49</a>. Thanks for the help,
+<a href="https://github.com/leonelgalan">Leonel Galan</a>, <a href="https://github.com/elhoyos">Juan Hoyos</a>, and
+<a href="https://github.com/elfassy">Michael Elfassy</a>!</p></li>
+<li><p>The <code>order</code> option can be a symbol now. Resolves <a href="https://github.com/mceachen/closure_tree/issues/46">issue 46</a>.</p></li>
+</ul><h3>4.0.0</h3>
 
 <ul>
 <li>
@@ -787,10 +796,7 @@ enable <code>config.active_record.whitelist_attributes</code> in your <code>conf
 <a href="http://www.jetbrains.com/ruby/features/">RubyMine</a> for the development of this project.</li>
 </ul>
       </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/mceachen">mceachen</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
+
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
               <script type="text/javascript">
