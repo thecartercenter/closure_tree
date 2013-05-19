@@ -7,37 +7,38 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
+    <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
   </head>
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/mceachen/closure_tree">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/mceachen/closure_tree/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/mceachen/closure_tree/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+
+      <header>
+        <h1>Closure tree</h1>
+        <p>Easily and efficiently make your ActiveRecord model support hierarchies</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/mceachen/closure_tree" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/mceachen/closure_tree/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/mceachen/closure_tree/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
 
     <div class="wrapper">
-
+      <nav>
+        <ul></ul>
+      </nav>
       <section>
-        <div id="title">
-          <h1>Closure tree</h1>
-          <p>Easily and efficiently make your ActiveRecord model support hierarchies</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/mceachen">mceachen</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
-        </div>
-
         <h1>Closure Tree</h1>
 
 <h3>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
@@ -796,7 +797,10 @@ enable <code>config.active_record.whitelist_attributes</code> in your <code>conf
 <a href="http://www.jetbrains.com/ruby/features/">RubyMine</a> for the development of this project.</li>
 </ul>
       </section>
-
+      <footer>
+        <p>Project maintained by <a href="https://github.com/mceachen">mceachen</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
               <script type="text/javascript">
