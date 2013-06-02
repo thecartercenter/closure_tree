@@ -39,9 +39,11 @@
         <ul></ul>
       </nav>
       <section>
-        <h1>Closure Tree</h1>
+        <h1>
+<a name="closure-tree" class="anchor" href="#closure-tree"><span class="octicon octicon-link"></span></a>Closure Tree</h1>
 
-<h3>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
+<h3>
+<a name="closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure" class="anchor" href="#closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure"><span class="octicon octicon-link"></span></a>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
 </h3>
 
 <p>Common applications include modeling hierarchical data, like tags, page graphs in CMSes,
@@ -77,6 +79,7 @@ closure_tree has some great features:</p>
 <li>3 SQL INSERT/UPDATEs on node reparenting</li>
 </ul>
 </li>
+<li><strong>Support for Rails 3.0, 3.1, 3.2, and 4.0.0.rc1</strong></li>
 <li>Support for reparenting children (and all their progeny)</li>
 <li>Support for <a href="#concurrency">concurrency</a> (using <a href="https://github/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
 <li>Support for polymorphism <a href="#sti">STI</a> within the hierarchy</li>
@@ -85,12 +88,15 @@ closure_tree has some great features:</p>
 </li>
 <li>Support for <a href="#deterministic-ordering">deterministic ordering</a> of children</li>
 <li>Support for <a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">preordered</a> traversal of descendants</li>
+<li>Support for rendering trees in <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language">DOT format</a>), using <a href="http://www.graphviz.org/">Graphviz</a>
+</li>
 <li>Excellent <a href="#testing">test coverage</a> in a variety of environments</li>
 </ul><p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
 <a href="http://www.slideshare.net/billkarwin/models-for-hierarchical-data">Models for hierarchical data presentation</a>
 for a description of different tree storage algorithms.</p>
 
-<h2>Table of Contents</h2>
+<h2>
+<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
@@ -102,7 +108,8 @@ for a description of different tree storage algorithms.</p>
 <li><a href="#faq">FAQ</a></li>
 <li><a href="#testing">Testing</a></li>
 <li><a href="#change-log">Change log</a></li>
-</ul><h2>Installation</h2>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Note that closure_tree only supports Rails 3.0 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
 
@@ -154,9 +161,11 @@ will be added automatically, so you don't need to create it.</p>
 
 <p>If you're starting from scratch you don't need to call <code>rebuild!</code>.</p>
 </li>
-</ol><h2>Usage</h2>
+</ol><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<h3>Creation</h3>
+<h3>
+<a name="creation" class="anchor" href="#creation"><span class="octicon octicon-link"></span></a>Creation</h3>
 
 <p>Create a root node:</p>
 
@@ -189,7 +198,8 @@ will be added automatically, so you don't need to create it.</p>
 <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"Grandparent"</span><span class="p">,</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="s2">"First Child"</span><span class="o">]</span>
 </pre></div>
 
-<h3>find_or_create_by_path</h3>
+<h3>
+<a name="find_or_create_by_path" class="anchor" href="#find_or_create_by_path"><span class="octicon octicon-link"></span></a>find_or_create_by_path</h3>
 
 <p>We can do all the node creation and add_child calls with one method call:</p>
 
@@ -210,7 +220,8 @@ provided to <code>acts_as_tree</code>.</p>
 <code>Tag.find_or_create_by_name</code> if the root directory doesn't exist (and
 <code>{:name =&gt; "chuck", :tag_type =&gt; "File"}</code> if the second-level tag doesn't exist, and so on).</p>
 
-<h3>Moving nodes around the tree</h3>
+<h3>
+<a name="moving-nodes-around-the-tree" class="anchor" href="#moving-nodes-around-the-tree"><span class="octicon octicon-link"></span></a>Moving nodes around the tree</h3>
 
 <p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the new parent for you:</p>
 
@@ -222,7 +233,8 @@ provided to <code>acts_as_tree</code>.</p>
 <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="o">]</span>
 </pre></div>
 
-<h3>Nested hashes</h3>
+<h3>
+<a name="nested-hashes" class="anchor" href="#nested-hashes"><span class="octicon octicon-link"></span></a>Nested hashes</h3>
 
 <p><code>hash_tree</code> provides a method for rendering a subtree as an
 ordered nested hash:</p>
@@ -256,7 +268,27 @@ server may not be happy trying to do this.</p>
 <p>HT: <a href="https://github.com/stefankroes/ancestry#arrangement">ancestry</a> and <a href="https://github.com/mceachen/closure_tree/issues/11">elhoyos</a></p>
 
 <h3>
-<a></a>Available options</h3>
+<a name="graph-visualization" class="anchor" href="#graph-visualization"><span class="octicon octicon-link"></span></a>Graph visualization</h3>
+
+<p><code>to_dot_digraph</code> is suitable for passing into <a href="http://www.graphviz.org/">Graphviz</a>.</p>
+
+<p>For example, for the above tree, write out the DOT file with ruby:</p>
+
+<div class="highlight"><pre><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"example.dot"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="no">Tag</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">to_dot_digraph</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+
+<p>Then, in a shell, <code>dot -Tpng example.dot &gt; example.png</code>, which produces:</p>
+
+<p><img src="https://raw.github.com/mceachen/closure_tree/master/img/example.png" alt="Example tree"></p>
+
+<p>If you want to customize the label value, override the <code>#to_digraph_label</code> instance method in your model.</p>
+
+<p>Just for kicks, this is the test tree I used for proving that preordered tree traversal was correct:</p>
+
+<p><img src="https://raw.github.com/mceachen/closure_tree/master/img/preorder.png" alt="Preordered test tree"></p>
+
+<h3>
+<a name="available-options" class="anchor" href="#available-options"><span class="octicon octicon-link"></span></a>Available options</h3>
 
 <p>When you include <code>acts_as_tree</code> in your model, you can provide a hash to override the following defaults:</p>
 
@@ -284,9 +316,11 @@ server may not be happy trying to do this.</p>
 <li>
 <code>:order</code> used to set up <a href="#deterministic-ordering">deterministic ordering</a>
 </li>
-</ul><h2>Accessing Data</h2>
+</ul><h2>
+<a name="accessing-data" class="anchor" href="#accessing-data"><span class="octicon octicon-link"></span></a>Accessing Data</h2>
 
-<h3>Class methods</h3>
+<h3>
+<a name="class-methods" class="anchor" href="#class-methods"><span class="octicon octicon-link"></span></a>Class methods</h3>
 
 <ul>
 <li>
@@ -303,7 +337,8 @@ server may not be happy trying to do this.</p>
 <code>Tag.find_or_create_by_path(path)</code> returns the node whose name path is <code>path</code>, and will create the node if it doesn't exist already.See (#find_or_create_by_path).</li>
 <li>
 <code>Tag.find_all_by_generation(generation_level)</code> returns the descendant nodes who are <code>generation_level</code> away from a root. <code>Tag.find_all_by_generation(0)</code> is equivalent to <code>Tag.roots</code>.</li>
-</ul><h3>Instance methods</h3>
+</ul><h3>
+<a name="instance-methods" class="anchor" href="#instance-methods"><span class="octicon octicon-link"></span></a>Instance methods</h3>
 
 <ul>
 <li>
@@ -364,7 +399,8 @@ server may not be happy trying to do this.</p>
 </li>
 <li>
 <code>tag.destroy</code> will destroy a node and do <em>something</em> to its children, which is determined by the <code>:dependent</code> option passed to <code>acts_as_tree</code>.</li>
-</ul><h2>Polymorphic hierarchies with STI</h2>
+</ul><h2>
+<a name="polymorphic-hierarchies-with-sti" class="anchor" href="#polymorphic-hierarchies-with-sti"><span class="octicon octicon-link"></span></a>Polymorphic hierarchies with STI</h2>
 
 <p>Polymorphic models using single table inheritance (STI) are supported:</p>
 
@@ -398,7 +434,8 @@ you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:
 
 <p>See <a href="https://github.com/mceachen/closure_tree/issues/43">issue 43</a> for more information.</p>
 
-<h2>Deterministic ordering</h2>
+<h2>
+<a name="deterministic-ordering" class="anchor" href="#deterministic-ordering"><span class="octicon octicon-link"></span></a>Deterministic ordering</h2>
 
 <p>By default, children will be ordered by your database engine, which may not be what you want.</p>
 
@@ -484,7 +521,8 @@ element in scope will be the sibling immediately "after" <code>self</code>
 <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"a"</span><span class="o">]</span>
 </pre></div>
 
-<h2>Concurrency</h2>
+<h2>
+<a name="concurrency" class="anchor" href="#concurrency"><span class="octicon octicon-link"></span></a>Concurrency</h2>
 
 <p>Several methods, especially <code>#rebuild</code> and <code>#find_or_create_by_path</code>, cannot run concurrently correctly.
 <code>#find_or_create_by_path</code>, for example, may create duplicate nodes.</p>
@@ -505,16 +543,19 @@ of with_advisory_lock, pass <code>:with_advisory_lock =&gt; false</code> in the 
 <p>Note that you <em>will eventually have data corruption</em> if you disable advisory locks, write to your
 database with multiple threads, and don't provide an alternative mutex.</p>
 
-<h2>FAQ</h2>
+<h2>
+<a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
 
-<h3>Does this gem support multiple parents?</h3>
+<h3>
+<a name="does-this-gem-support-multiple-parents" class="anchor" href="#does-this-gem-support-multiple-parents"><span class="octicon octicon-link"></span></a>Does this gem support multiple parents?</h3>
 
 <p>No. This gem's API is based on the assumption that each node has either 0 or 1 parent.</p>
 
 <p>The underlying closure tree structure will support multiple parents, but there would be many
 breaking-API changes to support it. I'm open to suggestions and pull requests.</p>
 
-<h3>How do I use this with test fixtures?</h3>
+<h3>
+<a name="how-do-i-use-this-with-test-fixtures" class="anchor" href="#how-do-i-use-this-with-test-fixtures"><span class="octicon octicon-link"></span></a>How do I use this with test fixtures?</h3>
 
 <p>Test fixtures aren't going to be running your <code>after_save</code> hooks after inserting all your
 fixture data, so you need to call <code>.rebuild!</code> before your test runs. There's an example in
@@ -530,13 +571,14 @@ the spec <code>tag_spec.rb</code>:</p>
 <p><strong>However, if you're just starting with Rails, may I humbly suggest you adopt a factory library</strong>,
 rather than using fixtures? <a href="https://www.google.com/search?q=fixtures+versus+factories">Lots of people have written about this already</a>.</p>
 
-<h2>Testing</h2>
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
 
-<p>Closure tree is <a href="http://travis-ci.org/#!/mceachen/closure_tree">tested under every combination</a> of</p>
+<p>Closure tree is <a href="http://travis-ci.org/#!/mceachen/closure_tree">tested under every valid combination</a> of</p>
 
 <ul>
-<li>Ruby 1.8.7 and Ruby 1.9.3</li>
-<li>The latest Rails 3.0, 3.1, and 3.2 branches, and</li>
+<li>Ruby 1.8.7, Ruby 1.9.3, and Ruby 2.0.0</li>
+<li>The latest Rails 3.0, 3.1, 3.2, and 4.0 branches, and</li>
 <li>MySQL and PostgreSQL. SQLite works in a single-threaded environment.</li>
 </ul><p>Assuming you're using <a href="https://github.com/sstephenson/rbenv">rbenv</a>, you can use <code>tests.sh</code> to
 run the test matrix locally.</p>
@@ -544,9 +586,17 @@ run the test matrix locally.</p>
 <p>Parallelism is not tested with Rails 3.0.x nor 3.1.x due to this
 <a href="https://github.com/rails/rails/issues/7538">known issue</a>.</p>
 
-<h2>Change log</h2>
+<h2>
+<a name="change-log" class="anchor" href="#change-log"><span class="octicon octicon-link"></span></a>Change log</h2>
 
-<h3>4.0.1</h3>
+<h3>
+<a name="410" class="anchor" href="#410"><span class="octicon octicon-link"></span></a>4.1.0</h3>
+
+<ul>
+<li>Added support for Rails 4.0.0.rc1 and Ruby 2.0.0 (while maintaining backward compatibility with Rails 3, BOOYA)</li>
+<li>Added <code>#to_dot_digraph</code>, suitable for Graphviz rendering</li>
+</ul><h3>
+<a name="401" class="anchor" href="#401"><span class="octicon octicon-link"></span></a>4.0.1</h3>
 
 <ul>
 <li><p>Numeric, deterministically ordered siblings will always be <a href="previously,%20the%20sort%20order%20might%20use%20negative%20values,%20which%20broke%20the%20preordering">0..#{self_and_siblings.count}</a>.
@@ -554,7 +604,8 @@ Resolves <a href="https://github.com/mceachen/closure_tree/issues/49">issue 49</
 <a href="https://github.com/leonelgalan">Leonel Galan</a>, <a href="https://github.com/elhoyos">Juan Hoyos</a>, and
 <a href="https://github.com/elfassy">Michael Elfassy</a>!</p></li>
 <li><p>The <code>order</code> option can be a symbol now. Resolves <a href="https://github.com/mceachen/closure_tree/issues/46">issue 46</a>.</p></li>
-</ul><h3>4.0.0</h3>
+</ul><h3>
+<a name="400" class="anchor" href="#400"><span class="octicon octicon-link"></span></a>4.0.0</h3>
 
 <ul>
 <li>
@@ -566,7 +617,8 @@ the "_ct" class and instance member.</p>
 <p><em>This change may break consumers</em>, so I incremented the major version number, even though no new
 functionality was released.</p>
 </li>
-</ul><h3>3.10.2</h3>
+</ul><h3>
+<a name="3102" class="anchor" href="#3102"><span class="octicon octicon-link"></span></a>3.10.2</h3>
 
 <ul>
 <li><p>Prevent faulty SQL statement when <code>#siblings</code> is called on an unsaved records.
@@ -575,7 +627,8 @@ request by <a href="https://github.com/garygreyling">Gary Greyling</a>.</p></li>
 <li><p>The <code>.roots</code> class method now correctly respects the <code>:order</code> option.
 Resolves <a href="https://github.com/mceachen/closure_tree/issues/53">issue 53</a>.
 Thanks for finding this, <a href="https://github.com/brendon">Brendon Muir</a>!</p></li>
-</ul><h3>3.10.1</h3>
+</ul><h3>
+<a name="3101" class="anchor" href="#3101"><span class="octicon octicon-link"></span></a>3.10.1</h3>
 
 <ul>
 <li><p>Multipart constant names like "Admin::PageHierarchy" are now supported.
@@ -585,12 +638,14 @@ Thanks for the perfect pull request, <a href="https://github.com/fd">Simon Menke
 to hash collisions in the hierarchy class. A better hash implementation addressed
 <a href="https://github.com/mceachen/closure_tree/issues/48">issue 48</a>.
 Thanks, <a href="https://github.com/jturkel">Joel Turkel</a>!</p></li>
-</ul><h3>3.10.0</h3>
+</ul><h3>
+<a name="3100" class="anchor" href="#3100"><span class="octicon octicon-link"></span></a>3.10.0</h3>
 
 <ul>
 <li>Added <code>#roots_and_descendants_preordered</code>.
 Thanks for the suggestion, <a href="https://github.com/leonelgalan">Leonel Galan</a>!</li>
-</ul><h3>3.9.0</h3>
+</ul><h3>
+<a name="390" class="anchor" href="#390"><span class="octicon octicon-link"></span></a>3.9.0</h3>
 
 <ul>
 <li>Added <code>.child_ids</code>.</li>
@@ -600,39 +655,46 @@ Thanks for the suggestion, <a href="https://github.com/leonelgalan">Leonel Galan
 Because <code>Tag.create!(:parent =&gt; ...)</code> requires a <code>.reload</code>, I removed it as an example.</li>
 </ul><p>All three of these improvements were suggested by Andrew Bromwich. Thanks!</p>
 
-<h3>3.8.2</h3>
+<h3>
+<a name="382" class="anchor" href="#382"><span class="octicon octicon-link"></span></a>3.8.2</h3>
 
 <ul>
 <li>find_by_path uses 1 SELECT now. BOOM.</li>
-</ul><h3>3.8.1</h3>
+</ul><h3>
+<a name="381" class="anchor" href="#381"><span class="octicon octicon-link"></span></a>3.8.1</h3>
 
 <ul>
 <li>Double-check locking for find_or_create_by_path</li>
-</ul><h3>3.8.0</h3>
+</ul><h3>
+<a name="380" class="anchor" href="#380"><span class="octicon octicon-link"></span></a>3.8.0</h3>
 
 <ul>
 <li>Support for preordered descendants. This requires a numeric sort order column.
 Resolves <a href="https://github.com/mceachen/closure_tree/issues/38">feature request 38</a>.</li>
 <li>Moved modules from <code>acts_as_tree</code> into separate files</li>
-</ul><h3>3.7.3</h3>
+</ul><h3>
+<a name="373" class="anchor" href="#373"><span class="octicon octicon-link"></span></a>3.7.3</h3>
 
 <p>Due to MySQL's inability to lock rows properly, I've switched to advisory_locks for
 all write paths. This will prevent deadlocks, addressing
 <a href="https://github.com/mceachen/closure_tree/issues/41">issue 41</a>.</p>
 
-<h3>3.7.2</h3>
+<h3>
+<a name="372" class="anchor" href="#372"><span class="octicon octicon-link"></span></a>3.7.2</h3>
 
 <ul>
 <li>Support for UUID primary keys. Addresses
 <a href="https://github.com/mceachen/closure_tree/issues/40">issue 40</a>. Thanks for the pull request,
 <a href="https://github.com/calexicoz">Julien</a>!</li>
-</ul><h3>3.7.1</h3>
+</ul><h3>
+<a name="371" class="anchor" href="#371"><span class="octicon octicon-link"></span></a>3.7.1</h3>
 
 <ul>
 <li>Moved requires into ActiveSupport.on_load</li>
 <li>Added <code>require 'with_advisory_lock'</code>
 </li>
-</ul><h3>3.7.0</h3>
+</ul><h3>
+<a name="370" class="anchor" href="#370"><span class="octicon octicon-link"></span></a>3.7.0</h3>
 
 <p><strong>Thread safety!</strong></p>
 
@@ -641,52 +703,61 @@ all write paths. This will prevent deadlocks, addressing
 <a href="https://github.com/mceachen/with_advisory_lock">Advisory locks</a> were
 integrated with the class-level <code>find_or_create_by_path</code> and <code>rebuild!</code>.</li>
 <li>Pessimistic locking is used by the instance-level <code>find_or_create_by_path</code>.</li>
-</ul><h3>3.6.9</h3>
+</ul><h3>
+<a name="369" class="anchor" href="#369"><span class="octicon octicon-link"></span></a>3.6.9</h3>
 
 <ul>
 <li>
 <a href="https://github.com/elskwid">Don Morrison</a> massaged the <a href="#nested-hashes">#hash_tree</a> query to
 be more efficient, and found a bug in <code>hash_tree</code>'s query that resulted in duplicate rows,
 wasting time on the ruby side.</li>
-</ul><h3>3.6.7</h3>
+</ul><h3>
+<a name="367" class="anchor" href="#367"><span class="octicon octicon-link"></span></a>3.6.7</h3>
 
 <ul>
 <li>Added workaround for ActiveRecord::Observer usage pre-db-creation. Addresses
 <a href="https://github.com/mceachen/closure_tree/issues/32">issue 32</a>.
 Thanks, <a href="https://github.com/elskwid">Don Morrison</a>!</li>
-</ul><h3>3.6.6</h3>
+</ul><h3>
+<a name="366" class="anchor" href="#366"><span class="octicon octicon-link"></span></a>3.6.6</h3>
 
 <ul>
 <li>Added support for Rails 4's <a href="https://github.com/rails/strong_parameters">strong parameter</a>.
 Thanks, <a href="https://github.com/bensie">James Miller</a>!</li>
-</ul><h3>3.6.5</h3>
+</ul><h3>
+<a name="365" class="anchor" href="#365"><span class="octicon octicon-link"></span></a>3.6.5</h3>
 
 <ul>
 <li>Use <code>quote_table_name</code> instead of <code>quote_column_name</code>. Addresses
 <a href="https://github.com/mceachen/closure_tree/issues/29">issue 29</a>. Thanks,
 <a href="https://github.com/vjt">Marcello Barnaba</a>!</li>
-</ul><h3>3.6.4</h3>
+</ul><h3>
+<a name="364" class="anchor" href="#364"><span class="octicon octicon-link"></span></a>3.6.4</h3>
 
 <ul>
 <li>Use <code>.pluck</code> when available for <code>.ids_from</code>. Addresses
 <a href="https://github.com/mceachen/closure_tree/issues/26">issue 26</a>. Thanks,
 <a href="https://github.com/sturgill">Chris Sturgill</a>!</li>
-</ul><h3>3.6.3</h3>
+</ul><h3>
+<a name="363" class="anchor" href="#363"><span class="octicon octicon-link"></span></a>3.6.3</h3>
 
 <ul>
 <li>Fixed <a href="https://github.com/mceachen/closure_tree/issues/24">issue 24</a>, which optimized <code>#hash_tree</code>
 for roots. Thanks, <a href="https://github.com/rewritten">Saverio Trioni</a>!</li>
-</ul><h3>3.6.2</h3>
+</ul><h3>
+<a name="362" class="anchor" href="#362"><span class="octicon octicon-link"></span></a>3.6.2</h3>
 
 <ul>
 <li>Fixed <a href="https://github.com/mceachen/closure_tree/issues/23">issue 23</a>, which added support for <code>#siblings</code>
 when sort_order wasn't specified. Thanks, <a href="https://github.com/garygreyling">Gary Greyling</a>!</li>
-</ul><h3>3.6.1</h3>
+</ul><h3>
+<a name="361" class="anchor" href="#361"><span class="octicon octicon-link"></span></a>3.6.1</h3>
 
 <ul>
 <li>Fixed <a href="https://github.com/mceachen/closure_tree/issues/20">issue 20</a>, which affected
 deterministic ordering when siblings where different STI classes. Thanks, <a href="https://github.com/edwinramirez">edwinramirez</a>!</li>
-</ul><h3>3.6.0</h3>
+</ul><h3>
+<a name="360" class="anchor" href="#360"><span class="octicon octicon-link"></span></a>3.6.0</h3>
 
 <p>Added support for:</p>
 
@@ -697,32 +768,38 @@ deterministic ordering when siblings where different STI classes. Thanks, <a hre
 <li>ActiveRecord::Base.table_name_suffix</li>
 </ul><p>This addresses <a href="https://github.com/mceachen/closure_tree/issues/21">issue 21</a>. Thanks, <a href="https://github.com/juddblair">Judd Blair</a>!</p>
 
-<h3>3.5.2</h3>
+<h3>
+<a name="352" class="anchor" href="#352"><span class="octicon octicon-link"></span></a>3.5.2</h3>
 
 <ul>
 <li>Added <code>find_all_by_generation</code>
 for <a href="https://github.com/mceachen/closure_tree/issues/17">feature request 17</a>.</li>
-</ul><h3>3.4.2</h3>
+</ul><h3>
+<a name="342" class="anchor" href="#342"><span class="octicon octicon-link"></span></a>3.4.2</h3>
 
 <ul>
 <li>Fixed <a href="https://github.com/mceachen/closure_tree/issues/18">issue 18</a>, which affected
 append_node/prepend_node ordering when the first node didn't have an explicit order_by value</li>
-</ul><h3>3.4.1</h3>
+</ul><h3>
+<a name="341" class="anchor" href="#341"><span class="octicon octicon-link"></span></a>3.4.1</h3>
 
 <ul>
 <li>Reverted .gemspec mistake that changed add_development_dependency to add_runtime_dependency</li>
-</ul><h3>3.4.0</h3>
+</ul><h3>
+<a name="340" class="anchor" href="#340"><span class="octicon octicon-link"></span></a>3.4.0</h3>
 
 <p>Fixed <a href="https://github.com/mceachen/closure_tree/issues/15">issue 15</a>:</p>
 
 <ul>
 <li>"parent" is now attr_accessible, which adds support for constructor-provided parents.</li>
 <li>updated readme accordingly</li>
-</ul><h3>3.3.2</h3>
+</ul><h3>
+<a name="332" class="anchor" href="#332"><span class="octicon octicon-link"></span></a>3.3.2</h3>
 
 <ul>
 <li>Merged calebphillips' patch for a more efficient leaves query</li>
-</ul><h3>3.3.1</h3>
+</ul><h3>
+<a name="331" class="anchor" href="#331"><span class="octicon octicon-link"></span></a>3.3.1</h3>
 
 <ul>
 <li>Added support for partially-unsaved hierarchies <a href="https://github.com/mceachen/closure_tree/issues/13">issue 13</a>:
@@ -733,53 +810,63 @@ a.children &lt;&lt; b
 a.save
 </code>
 </li>
-</ul><h3>3.3.0</h3>
+</ul><h3>
+<a name="330" class="anchor" href="#330"><span class="octicon octicon-link"></span></a>3.3.0</h3>
 
 <ul>
 <li>Added <a href="#nested-hashes"><code>hash_tree</code></a>.</li>
-</ul><h3>3.2.1</h3>
+</ul><h3>
+<a name="321" class="anchor" href="#321"><span class="octicon octicon-link"></span></a>3.2.1</h3>
 
 <ul>
 <li>Added <code>ancestor_ids</code>, <code>descendant_ids</code>, and <code>sibling_ids</code>
 </li>
 <li>Added example spec to solve <a href="https://github.com/mceachen/closure_tree/issues/9">issue 9</a>
 </li>
-</ul><h3>3.2.0</h3>
+</ul><h3>
+<a name="320" class="anchor" href="#320"><span class="octicon octicon-link"></span></a>3.2.0</h3>
 
 <ul>
 <li>Added support for deterministic ordering of nodes.</li>
-</ul><h3>3.1.0</h3>
+</ul><h3>
+<a name="310" class="anchor" href="#310"><span class="octicon octicon-link"></span></a>3.1.0</h3>
 
 <ul>
 <li>Switched to using <code>has_many :though</code> rather than <code>has_and_belongs_to_many</code>
 </li>
-</ul><h3>3.0.4</h3>
+</ul><h3>
+<a name="304" class="anchor" href="#304"><span class="octicon octicon-link"></span></a>3.0.4</h3>
 
 <ul>
 <li>Merged <a href="https://github.com/mceachen/closure_tree/pull/8">pull request</a> to fix <code>.siblings</code> and <code>.self_and_siblings</code>
 (Thanks, <a href="https://github.com/eljojo">eljojo</a>!)</li>
-</ul><h3>3.0.3</h3>
+</ul><h3>
+<a name="303" class="anchor" href="#303"><span class="octicon octicon-link"></span></a>3.0.3</h3>
 
 <ul>
 <li>Added support for ActiveRecord's whitelist_attributes
 (Make sure you read <a href="http://guides.rubyonrails.org/security.html">the Rails Security Guide</a>, and
 enable <code>config.active_record.whitelist_attributes</code> in your <code>config/application.rb</code> ASAP!)</li>
-</ul><h3>3.0.2</h3>
+</ul><h3>
+<a name="302" class="anchor" href="#302"><span class="octicon octicon-link"></span></a>3.0.2</h3>
 
 <ul>
 <li>Fix for ancestry-loop detection (performed by a validation, not through raising an exception in before_save)</li>
-</ul><h3>3.0.1</h3>
+</ul><h3>
+<a name="301" class="anchor" href="#301"><span class="octicon octicon-link"></span></a>3.0.1</h3>
 
 <ul>
 <li>Support 3.2.0's fickle deprecation of InstanceMethods (Thanks, <a href="https://github.com/mceachen/closure_tree/pull/5">jheiss</a>)!</li>
-</ul><h3>3.0.0</h3>
+</ul><h3>
+<a name="300" class="anchor" href="#300"><span class="octicon octicon-link"></span></a>3.0.0</h3>
 
 <ul>
 <li>Support for polymorphic trees</li>
 <li>
 <code>find_by_path</code> and <code>find_or_create_by_path</code> signatures changed to support constructor attributes</li>
 <li>tested against Rails 3.1.3</li>
-</ul><h3>2.0.0</h3>
+</ul><h3>
+<a name="200" class="anchor" href="#200"><span class="octicon octicon-link"></span></a>2.0.0</h3>
 
 <ul>
 <li>Had to increment the major version, as rebuild! will need to be called by prior consumers to support the new <code>leaves</code> class and instance methods.</li>
@@ -788,7 +875,8 @@ enable <code>config.active_record.whitelist_attributes</code> in your <code>conf
 <li>Switched from default rails plugin directory structure to rspec</li>
 <li>Support for running specs under different database engines: <code>export DB ; for DB in sqlite3 mysql postgresql ; do rake ; done</code>
 </li>
-</ul><h2>Thanks to</h2>
+</ul><h2>
+<a name="thanks-to" class="anchor" href="#thanks-to"><span class="octicon octicon-link"></span></a>Thanks to</h2>
 
 <ul>
 <li><a href="https://github.com/collectiveidea/awesome_nested_set">https://github.com/collectiveidea/awesome_nested_set</a></li>
