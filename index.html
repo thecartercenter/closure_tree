@@ -50,7 +50,8 @@
 and tracking user referrals.</p>
 
 <p><a href="http://travis-ci.org/mceachen/closure_tree"><img src="https://secure.travis-ci.org/mceachen/closure_tree.png?branch=master" alt="Build Status"></a>
-<a href="http://rubygems.org/gems/closure_tree"><img src="https://badge.fury.io/rb/closure_tree.png" alt="Gem Version"></a></p>
+<a href="http://rubygems.org/gems/closure_tree"><img src="https://badge.fury.io/rb/closure_tree.png" alt="Gem Version"></a>
+<a href="https://codeclimate.com/github/mceachen/closure_tree"><img src="https://codeclimate.com/github/mceachen/closure_tree.png" alt="Code Climate"></a></p>
 
 <p>Substantially more efficient than
 <a href="https://github.com/stefankroes/ancestry">ancestry</a> and
@@ -211,7 +212,8 @@ Ancestry paths may be built using any column in your model. The default
 column is <code>name</code>, which can be changed with the :name_column option
 provided to <code>acts_as_tree</code>.</p>
 
-<p>Note that any other AR fields can be set with the second, optional <code>attributes</code> argument.</p>
+<p>Note that any other AR fields can be set with the second, optional <code>attributes</code> argument,
+and as of version 4.2.0, these attributes are added to the where clause as selection criteria.</p>
 
 <div class="highlight"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w{home chuck Photos"}</span><span class="p">,</span> <span class="p">{</span><span class="ss">:tag_type</span> <span class="o">=&gt;</span> <span class="s2">"File"</span><span class="p">})</span>
 </pre></div>
@@ -332,11 +334,13 @@ server may not be happy trying to do this.</p>
 <li>
 <code>Tag.hash_tree</code> returns an <a href="#nested-hashes">ordered, nested hash</a> that can be depth-limited.</li>
 <li>
-<code>Tag.find_by_path(path)</code> returns the node whose name path is <code>path</code>. See (#find_or_create_by_path).</li>
+<code>Tag.find_by_path(path, attributes)</code> returns the node whose name path is <code>path</code>. See (#find_or_create_by_path).</li>
 <li>
-<code>Tag.find_or_create_by_path(path)</code> returns the node whose name path is <code>path</code>, and will create the node if it doesn't exist already.See (#find_or_create_by_path).</li>
+<code>Tag.find_or_create_by_path(path, attributes)</code> returns the node whose name path is <code>path</code>, and will create the node if it doesn't exist already.See (#find_or_create_by_path).</li>
 <li>
 <code>Tag.find_all_by_generation(generation_level)</code> returns the descendant nodes who are <code>generation_level</code> away from a root. <code>Tag.find_all_by_generation(0)</code> is equivalent to <code>Tag.roots</code>.</li>
+<li>
+<code>Tag.with_ancestor(ancestors)</code> scopes to all descendants whose ancestor is in the given list.</li>
 </ul><h3>
 <a name="instance-methods" class="anchor" href="#instance-methods"><span class="octicon octicon-link"></span></a>Instance methods</h3>
 
@@ -590,6 +594,19 @@ run the test matrix locally.</p>
 <a name="change-log" class="anchor" href="#change-log"><span class="octicon octicon-link"></span></a>Change log</h2>
 
 <h3>
+<a name="420" class="anchor" href="#420"><span class="octicon octicon-link"></span></a>4.2.0</h3>
+
+<ul>
+<li>Added <code>with_ancestor(*ancestors)</code>. Thanks for the idea, <a href="https://github.com/mgornick">Matt</a>!</li>
+<li>Applied <a href="https://github.com/leonelgalan">Leonel Galan</a>'s fix for Strong Attribute support</li>
+<li>
+<code>find_or_create_by</code> now uses passed-in attributes as both selection and creation criteria.
+Thanks for the help, <a href="https://github.com/juddblair">Judd Blair</a>!
+<strong>Please note that this changes prior behavior—test your code with this new version!</strong>
+</li>
+<li>
+<code>ct_advisory_lock</code> was moved into the <code>_ct</code> support class, to reduce model method pollution</li>
+</ul><h3>
 <a name="410" class="anchor" href="#410"><span class="octicon octicon-link"></span></a>4.1.0</h3>
 
 <ul>
