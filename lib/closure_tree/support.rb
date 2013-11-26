@@ -116,5 +116,19 @@ module ClosureTree
         yield
       end
     end
+
+    def rails_three_oh_ex
+      @rails_three_oh_ex ||= ActiveRecord.version < Gem::Version.new("3.1")
+    end
+
+    def duplicate(target, dup_options = nil)
+      if dup_options.present?
+        target.dup(dup_options)
+      elsif rails_three_oh_ex
+        target.clone
+      else
+        target.dup
+      end
+    end
   end
 end

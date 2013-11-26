@@ -48,6 +48,14 @@ shared_examples_for "Tag (without fixtures)" do
         tag_class.roots.should == [a]
         tag_class.leaves.should == [a]
       end
+
+      it "deep_dupes" do
+        a = tag_class.create!(:name => "a")
+        a_dupe = a.deep_dup
+        a.id.should_not == a_dupe.id
+        a_dupe.name.should == a.name
+        a_dupe.should be_a root
+      end
     end
 
     context "with 2 tags" do
@@ -64,6 +72,12 @@ shared_examples_for "Tag (without fixtures)" do
       end
       it "should return an empty array for leaves" do
         @leaf.child_ids.should be_empty
+      end
+      it "deep_dupes" do
+        dupe = @root.deep_dup
+        dupe.id.should_not == @root.id
+        dupe.children.map { |ea| ea.name }.should == %w(leaf)
+        dupe.children.first.id.should_not == @leaf
       end
     end
 
@@ -458,15 +472,15 @@ shared_examples_for "Tag (without fixtures)" do
 digraph G {
   #{a} [label="a"]
   #{a} -> #{b1}
-  #{b1} [label="b1"]
+        #{b1} [label="b1"]
   #{a} -> #{b2}
-  #{b2} [label="b2"]
+        #{b2} [label="b2"]
   #{b1} -> #{c1}
-  #{c1} [label="c1"]
+        #{c1} [label="c1"]
   #{b2} -> #{c2}
-  #{c2} [label="c2"]
+        #{c2} [label="c2"]
   #{b2} -> #{c3}
-  #{c3} [label="c3"]
+        #{c3} [label="c3"]
 }
         DOT
       end

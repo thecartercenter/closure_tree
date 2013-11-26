@@ -7,6 +7,7 @@ require 'closure_tree/hash_tree'
 require 'closure_tree/digraphs'
 require 'closure_tree/deterministic_ordering'
 require 'closure_tree/numeric_deterministic_ordering'
+require 'closure_tree/deep_clone'
 
 module ClosureTree
   module ActsAsTree
@@ -22,6 +23,7 @@ module ClosureTree
       # tests fail if you include Model before HierarchyMaintenance wtf
       include ClosureTree::HierarchyMaintenance
       include ClosureTree::Model
+      include ClosureTree::DeepClone
       include ClosureTree::Finders
       include ClosureTree::HashTree
       include ClosureTree::Digraphs
