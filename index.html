@@ -52,7 +52,8 @@ and tracking user referrals.</p>
 <p><a href="http://travis-ci.org/mceachen/closure_tree"><img src="https://secure.travis-ci.org/mceachen/closure_tree.png?branch=master" alt="Build Status"></a>
 <a href="http://rubygems.org/gems/closure_tree"><img src="https://badge.fury.io/rb/closure_tree.png" alt="Gem Version"></a>
 <a href="https://codeclimate.com/github/mceachen/closure_tree"><img src="https://codeclimate.com/github/mceachen/closure_tree.png" alt="Code Climate"></a>
-<a href="https://gemnasium.com/mceachen/closure_tree"><img src="https://gemnasium.com/mceachen/closure_tree.png" alt="Dependency Status"></a></p>
+<a href="https://gemnasium.com/mceachen/closure_tree"><img src="https://gemnasium.com/mceachen/closure_tree.png" alt="Dependency Status"></a>
+<a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/mceachen/closure_tree/trend.png" alt="Bitdeli Badge"></a></p>
 
 <p>Substantially more efficient than
 <a href="https://github.com/stefankroes/ancestry">ancestry</a> and
@@ -81,8 +82,8 @@ closure_tree has some great features:</p>
 <li>3 SQL INSERT/UPDATEs on node reparenting</li>
 </ul>
 </li>
-<li><strong>Support for Rails 3.0, 3.1, 3.2, and 4.0</strong></li>
-<li>Support for reparenting children (and all their progeny)</li>
+<li><strong>Support for Rails 3.0, 3.1, 3.2, 4.0, and 4.1</strong></li>
+<li>Support for reparenting children (and all their descendants)</li>
 <li>Support for <a href="#concurrency">concurrency</a> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
 <li>Support for polymorphism <a href="#sti">STI</a> within the hierarchy</li>
 <li>
@@ -118,12 +119,15 @@ for a description of different tree storage algorithms.</p>
 <ol>
 <li><p>Add this to your Gemfile: <code>gem 'closure_tree'</code></p></li>
 <li><p>Run <code>bundle install</code></p></li>
-<li><p>Add <code>acts_as_tree</code> to your hierarchical model(s). There are a number of <a href="#available-options">options</a> you can pass in, too.</p></li>
+<li><p>Add <code>acts_as_tree</code> to your hierarchical model(s).
+Make sure you add <code>acts_as_tree</code> *after any <code>attr_accessible</code> and <code>self.table_name =</code>
+lines in your model.
+Please review the <a href="#available-options">available options</a> you can provide.</p></li>
 <li>
 <p>Add a migration to add a <code>parent_id</code> column to the model you want to act_as_tree.
 You may want to also <a href="#sort_order">add a column for deterministic ordering of children</a>, but that's optional.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
   <span class="k">def</span> <span class="nf">change</span>
     <span class="n">add_column</span> <span class="ss">:tag</span><span class="p">,</span> <span class="ss">:parent_id</span><span class="p">,</span> <span class="ss">:integer</span>
   <span class="k">end</span>
@@ -138,7 +142,7 @@ default the table name will be the model's table name, followed by
 "_hierarchies". Note that by calling <code>acts_as_tree</code>, a "virtual model" (in this case, <code>TagHierarchy</code>)
 will be added automatically, so you don't need to create it.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">CreateTagHierarchies</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">CreateTagHierarchies</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
   <span class="k">def</span> <span class="nf">change</span>
     <span class="n">create_table</span> <span class="ss">:tag_hierarchies</span><span class="p">,</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
       <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:ancestor_id</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>   <span class="c1"># ID of the parent/grandparent/great-grandparent/... tag</span>
@@ -173,29 +177,29 @@ will be added automatically, so you don't need to create it.</p>
 
 <p>Create a root node:</p>
 
-<div class="highlight"><pre><span class="n">grandparent</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Grandparent'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Grandparent'</span><span class="p">)</span>
 </pre></div>
 
 <p>Child nodes are created by appending to the children collection:</p>
 
-<div class="highlight"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Parent'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Parent'</span><span class="p">)</span>
 </pre></div>
 
 <p>Or by appending to the children collection:</p>
 
-<div class="highlight"><pre><span class="n">child2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Second Child'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Second Child'</span><span class="p">)</span>
 <span class="n">parent</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">child2</span>
 </pre></div>
 
 <p>Or by calling the "add_child" method:</p>
 
-<div class="highlight"><pre><span class="n">child3</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Third Child'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child3</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Third Child'</span><span class="p">)</span>
 <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span> <span class="n">child3</span>
 </pre></div>
 
 <p>Then:</p>
 
-<div class="highlight"><pre><span class="n">grandparent</span><span class="o">.</span><span class="n">self_and_descendants</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:name</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span><span class="o">.</span><span class="n">self_and_descendants</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:name</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"Grandparent"</span><span class="p">,</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="s2">"First Child"</span><span class="p">,</span> <span class="s2">"Second Child"</span><span class="p">,</span> <span class="s2">"Third Child"</span><span class="o">]</span>
 
 <span class="n">child1</span><span class="o">.</span><span class="n">ancestry_path</span>
@@ -207,7 +211,7 @@ will be added automatically, so you don't need to create it.</p>
 
 <p>We can do all the node creation and add_child calls with one method call:</p>
 
-<div class="highlight"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span><span class="s2">"grandparent"</span><span class="p">,</span> <span class="s2">"parent"</span><span class="p">,</span> <span class="s2">"child"</span><span class="o">]</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span><span class="s2">"grandparent"</span><span class="p">,</span> <span class="s2">"parent"</span><span class="p">,</span> <span class="s2">"child"</span><span class="o">]</span><span class="p">)</span>
 </pre></div>
 
 <p>You can <code>find</code> as well as <code>find_or_create</code> by "ancestry paths".
@@ -218,7 +222,7 @@ provided to <code>acts_as_tree</code>.</p>
 <p>Note that any other AR fields can be set with the second, optional <code>attributes</code> argument,
 and as of version 4.2.0, these attributes are added to the where clause as selection criteria.</p>
 
-<div class="highlight"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w{home chuck Photos"}</span><span class="p">,</span> <span class="p">{</span><span class="ss">:tag_type</span> <span class="o">=&gt;</span> <span class="s2">"File"</span><span class="p">})</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w{home chuck Photos"}</span><span class="p">,</span> <span class="p">{</span><span class="ss">:tag_type</span> <span class="o">=&gt;</span> <span class="s2">"File"</span><span class="p">})</span>
 </pre></div>
 
 <p>This will pass the attribute hash of <code>{:name =&gt; "home", :tag_type =&gt; "File"}</code> to
@@ -230,7 +234,7 @@ and as of version 4.2.0, these attributes are added to the where clause as selec
 
 <p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the new parent for you:</p>
 
-<div class="highlight"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b c d)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b c d)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(e f g h)</span>
 <span class="n">e</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">root</span>
 <span class="n">d</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="c1"># "d.children &lt;&lt; e" would work too, of course</span>
@@ -244,7 +248,7 @@ and as of version 4.2.0, these attributes are added to the where clause as selec
 <p><code>hash_tree</code> provides a method for rendering a subtree as an
 ordered nested hash:</p>
 
-<div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">b</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b)</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">b2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b2)</span>
 <span class="n">d1</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(c1 d1)</span>
@@ -279,7 +283,7 @@ server may not be happy trying to do this.</p>
 
 <p>For example, for the above tree, write out the DOT file with ruby:</p>
 
-<div class="highlight"><pre><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"example.dot"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="no">Tag</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">to_dot_digraph</span><span class="p">)</span> <span class="p">}</span>
+<div class="highlight highlight-ruby"><pre><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"example.dot"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="no">Tag</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">to_dot_digraph</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 
 <p>Then, in a shell, <code>dot -Tpng example.dot &gt; example.png</code>, which produces:</p>
@@ -414,7 +418,7 @@ server may not be happy trying to do this.</p>
 <ol>
 <li>Create a db migration that adds a String <code>type</code> column to your model</li>
 <li>Subclass the model class. You only need to add <code>acts_as_tree</code> to your base class:</li>
-</ol><div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</ol><div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="n">acts_as_tree</span>
 <span class="k">end</span>
 <span class="k">class</span> <span class="nc">WhenTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
@@ -425,13 +429,13 @@ server may not be happy trying to do this.</p>
 <p>Please note that Rails (&lt;= 3.2) doesn't handle polymorphic associations correctly if
 you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:</p>
 
-<div class="highlight"><pre><span class="c1"># BAD: ActiveRecord ignores the :type attribute:</span>
+<div class="highlight highlight-ruby"><pre><span class="c1"># BAD: ActiveRecord ignores the :type attribute:</span>
 <span class="n">root</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"child"</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s2">"WhenTag"</span><span class="p">)</span>
 </pre></div>
 
 <p>Instead, use either <code>.add_child</code> or <code>children &lt;&lt;</code>:</p>
 
-<div class="highlight"><pre><span class="c1"># GOOD!</span>
+<div class="highlight highlight-ruby"><pre><span class="c1"># GOOD!</span>
 <span class="n">a</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"a"</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="no">WhenTag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"b"</span><span class="p">)</span>
 <span class="n">a</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">b</span>
@@ -448,19 +452,19 @@ you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:
 
 <p>If you want to order children alphabetically, and your model has a <code>name</code> column, you'd do this:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'name'</span>
 <span class="k">end</span>
 </pre></div>
 
 <p>If you want a specific order, add a new integer column to your model in a migration:</p>
 
-<div class="highlight"><pre><span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:sort_order</span>
+<div class="highlight highlight-ruby"><pre><span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:sort_order</span>
 </pre></div>
 
 <p>and in your model:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">OrderedTag</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">OrderedTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'sort_order'</span>
 <span class="k">end</span>
 </pre></div>
@@ -503,9 +507,9 @@ element in scope will be the sibling immediately "after" <code>self</code>
 <li>increment the order_column of all children of node1's parents whose order_column is &gt;= node2's new value by 1.</li>
 </ol>
 </li>
-</ul><div class="highlight"><pre>
+</ul><div class="highlight highlight-ruby"><pre>
 <span class="n">root</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"root"</span><span class="p">)</span>
-<span class="n">a</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"a"</span><span class="p">,</span> <span class="ss">:parent</span> <span class="o">=&gt;</span> <span class="s2">"root"</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"a"</span><span class="p">,</span> <span class="ss">:parent</span> <span class="o">=&gt;</span> <span class="n">root</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"b"</span><span class="p">)</span>
 <span class="n">c</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"c"</span><span class="p">)</span>
 
@@ -542,7 +546,7 @@ is used automatically to ensure correctness.</p>
 <p>If you are already managing concurrency elsewhere in your application, and want to disable the use
 of with_advisory_lock, pass <code>:with_advisory_lock =&gt; false</code> in the options hash:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">Tag</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span>
   <span class="n">acts_as_tree</span> <span class="ss">:with_advisory_lock</span> <span class="o">=&gt;</span> <span class="kp">false</span>
 <span class="k">end</span>
 </pre></div>
@@ -568,7 +572,7 @@ breaking-API changes to support it. I'm open to suggestions and pull requests.</
 fixture data, so you need to call <code>.rebuild!</code> before your test runs. There's an example in
 the spec <code>tag_spec.rb</code>:</p>
 
-<div class="highlight"><pre>  <span class="n">describe</span> <span class="s2">"Tag with fixtures"</span> <span class="k">do</span>
+<div class="highlight highlight-ruby"><pre>  <span class="n">describe</span> <span class="s2">"Tag with fixtures"</span> <span class="k">do</span>
     <span class="n">fixtures</span> <span class="ss">:tags</span>
     <span class="n">before</span> <span class="ss">:each</span> <span class="k">do</span>
       <span class="no">Tag</span><span class="o">.</span><span class="n">rebuild!</span> <span class="c1"># &lt;- required if you use fixtures</span>
@@ -588,7 +592,7 @@ if the <code>FLOCK_DIR</code> is set consistently for all ruby processes.</p>
 
 <p>In your <code>spec_helper.rb</code> or <code>minitest_helper.rb</code>, add a <code>before</code> and <code>after</code> block:</p>
 
-<div class="highlight"><pre><span class="n">before</span> <span class="k">do</span>
+<div class="highlight highlight-ruby"><pre><span class="n">before</span> <span class="k">do</span>
   <span class="no">ENV</span><span class="o">[</span><span class="s1">'FLOCK_DIR'</span><span class="o">]</span> <span class="o">=</span> <span class="no">Dir</span><span class="o">.</span><span class="n">mktmpdir</span>
 <span class="k">end</span>
 
