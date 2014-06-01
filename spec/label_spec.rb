@@ -277,7 +277,17 @@ describe Label do
     d.self_and_siblings.collect(&:sort_order).should == [0, 1, 2, 3]
   end
 
-  context "#add_sibling" do
+  context '#add_sibling' do
+    it 'works on root nodes' do
+      l = {}
+      (:a..:z).to_a.shuffle.each do |ea|
+        l[ea] = Label.create!(name: ea.to_s)
+      end
+      l[:a].add_sibling(l[:b])
+      l[:a].siblings_after.should include(l[:b])
+      l[:a].siblings_before.should_not include(l[:b])
+    end
+
     it "should move a node before another node which has an uninitialized sort_order" do
       f = Label.find_or_create_by_path %w(a b c d e fa)
       f0 = f.prepend_sibling(Label.new(:name => "fb")) # < not alpha sort, so name shouldn't matter
