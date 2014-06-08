@@ -52,8 +52,7 @@ and tracking user referrals.</p>
 <p><a href="http://travis-ci.org/mceachen/closure_tree"><img src="https://secure.travis-ci.org/mceachen/closure_tree.png?branch=master" alt="Build Status"></a>
 <a href="http://rubygems.org/gems/closure_tree"><img src="https://badge.fury.io/rb/closure_tree.png" alt="Gem Version"></a>
 <a href="https://codeclimate.com/github/mceachen/closure_tree"><img src="https://codeclimate.com/github/mceachen/closure_tree.png" alt="Code Climate"></a>
-<a href="https://gemnasium.com/mceachen/closure_tree"><img src="https://gemnasium.com/mceachen/closure_tree.png" alt="Dependency Status"></a>
-<a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/mceachen/closure_tree/trend.png" alt="Bitdeli Badge"></a></p>
+<a href="https://gemnasium.com/mceachen/closure_tree"><img src="https://gemnasium.com/mceachen/closure_tree.png" alt="Dependency Status"></a></p>
 
 <p>Substantially more efficient than
 <a href="https://github.com/stefankroes/ancestry">ancestry</a> and
@@ -82,7 +81,8 @@ closure_tree has some great features:</p>
 <li>3 SQL INSERT/UPDATEs on node reparenting</li>
 </ul>
 </li>
-<li><strong>Support for Rails 3.0, 3.1, 3.2, 4.0, and 4.1</strong></li>
+<li><strong>Support for Rails 3.2, 4.0, and 4.1</strong></li>
+<li><strong>Support for Ruby 1.9, 2.1, jRuby, and Rubinius</strong></li>
 <li>Support for reparenting children (and all their descendants)</li>
 <li>Support for <a href="#concurrency">concurrency</a> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
 <li>Support for polymorphism <a href="#sti">STI</a> within the hierarchy</li>
@@ -91,7 +91,7 @@ closure_tree has some great features:</p>
 </li>
 <li>Support for <a href="#deterministic-ordering">deterministic ordering</a> of children</li>
 <li>Support for <a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">preordered</a> traversal of descendants</li>
-<li>Support for rendering trees in <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language">DOT format</a>), using <a href="http://www.graphviz.org/">Graphviz</a>
+<li>Support for rendering trees in <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language)">DOT format</a>, using <a href="http://www.graphviz.org/">Graphviz</a>
 </li>
 <li>Excellent <a href="#testing">test coverage</a> in a variety of environments</li>
 </ul><p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
@@ -114,7 +114,7 @@ for a description of different tree storage algorithms.</p>
 </ul><h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Note that closure_tree only supports Rails 3.0 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
+<p>Note that closure_tree only supports Rails 3.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
 
 <ol>
 <li><p>Add this to your Gemfile: <code>gem 'closure_tree'</code></p></li>
@@ -305,7 +305,7 @@ server may not be happy trying to do this.</p>
 <li>
 <code>:parent_column_name</code> to override the column name of the parent foreign key in the model's table. This defaults to "parent_id".</li>
 <li>
-<code>:hierarchy_table_name</code> to override the hierarchy class name. This defaults to the singular name of the model + "Hierarchy", like <code>TagHierarchy</code>.</li>
+<code>:hierarchy_class_name</code> to override the hierarchy class name. This defaults to the singular name of the model + "Hierarchy", like <code>TagHierarchy</code>.</li>
 <li>
 <code>:hierarchy_table_name</code> to override the hierarchy table name. This defaults to the singular name of the model + "_hierarchies", like <code>tag_hierarchies</code>.</li>
 <li>
@@ -377,6 +377,8 @@ server may not be happy trying to do this.</p>
 <li>
 <code>tag.self_and_ancestors</code> returns a scope containing self, parent, grandparent, great grandparent, etc.</li>
 <li>
+<code>tag.self_and_ancestors_ids</code> returns IDs containing self, parent, grandparent, great grandparent, etc.</li>
+<li>
 <code>tag.siblings</code> returns a scope containing all nodes with the same parent as <code>tag</code>, excluding self.</li>
 <li>
 <code>tag.sibling_ids</code> returns an array of the IDs of the siblings.</li>
@@ -387,7 +389,9 @@ server may not be happy trying to do this.</p>
 <li>
 <code>tag.descendant_ids</code> returns an array of the IDs of the descendants.</li>
 <li>
-<code>tag.self_and_descendants</code> returns a scope of all children, childrens' children, etc., including self, ordered by depth.</li>
+<code>tag.self_and_descendants</code> returns a scope of self, all children, childrens' children, etc., ordered by depth.</li>
+<li>
+<code>tag.self_and_descendant_ids</code> returns IDs of self, all children, childrens' children, etc., ordered by depth.</li>
 <li>
 <code>tag.hash_tree</code> returns an <a href="#nested-hashes">ordered, nested hash</a> that can be depth-limited.</li>
 <li>
@@ -558,6 +562,16 @@ database with multiple threads, and don't provide an alternative mutex.</p>
 <a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
 
 <h3>
+<a name="are-there-any-how-to-articles-on-how-to-use-this-gem" class="anchor" href="#are-there-any-how-to-articles-on-how-to-use-this-gem"><span class="octicon octicon-link"></span></a>Are there any how-to articles on how to use this gem?</h3>
+
+<p>Yup! <a href="https://github.com/bodrovis">Ilya Bodrov</a> wrote <a href="http://www.sitepoint.com/nested-comments-rails/">Nested Comments with Rails</a>.</p>
+
+<h3>
+<a name="does-this-work-well-with-default_scope" class="anchor" href="#does-this-work-well-with-default_scope"><span class="octicon octicon-link"></span></a>Does this work well with <code>#default_scope</code>?</h3>
+
+<p>No. Please see <a href="https://github.com/mceachen/closure_tree/issues/86">issue 86</a> for details.</p>
+
+<h3>
 <a name="does-this-gem-support-multiple-parents" class="anchor" href="#does-this-gem-support-multiple-parents"><span class="octicon octicon-link"></span></a>Does this gem support multiple parents?</h3>
 
 <p>No. This gem's API is based on the assumption that each node has either 0 or 1 parent.</p>
@@ -602,19 +616,49 @@ if the <code>FLOCK_DIR</code> is set consistently for all ruby processes.</p>
 </pre></div>
 
 <h2>
+<a name="testing-with-closure-tree" class="anchor" href="#testing-with-closure-tree"><span class="octicon octicon-link"></span></a>Testing with Closure Tree</h2>
+
+<p>Closure tree comes with some RSpec2/3 matchers which you may use for your tests:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'spec_helper'</span>
+<span class="nb">require</span> <span class="s1">'closure_tree/test/matcher'</span>
+
+<span class="n">describe</span> <span class="no">Category</span> <span class="k">do</span>
+ <span class="c1"># Should syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span> <span class="p">}</span>
+ <span class="c1"># Expect syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">describe</span> <span class="no">Label</span> <span class="k">do</span>
+ <span class="c1"># Should syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span> <span class="p">}</span>
+ <span class="c1"># Expect syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">describe</span> <span class="no">TodoList</span><span class="o">::</span><span class="no">Item</span> <span class="k">do</span>
+ <span class="c1"># Should syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span><span class="p">(</span><span class="ss">:priority_order</span><span class="p">)</span> <span class="p">}</span>
+ <span class="c1"># Expect syntax</span>
+ <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span><span class="p">(</span><span class="ss">:priority_order</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span>
+
+</pre></div>
+
+<h2>
 <a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
 
 <p>Closure tree is <a href="http://travis-ci.org/#!/mceachen/closure_tree">tested under every valid combination</a> of</p>
 
 <ul>
-<li>Ruby 1.9.3 and Ruby 2.0.0</li>
-<li>The latest Rails 3.0, 3.1, 3.2, and 4.0 branches, and</li>
-<li>MySQL and PostgreSQL. SQLite works in a single-threaded environment.</li>
+<li>Ruby 1.9.3 , 2.0.0 and 2.1.2 and head</li>
+<li>Rubinius 2.2.1+ and head</li>
+<li>jRuby 1.9mode and head</li>
+<li>The latest Rails 3.2, 4.0, 4.1 and master branches</li>
+<li>Concurrency tests for MySQL and PostgreSQL. SQLite works in a single-threaded environment.</li>
 </ul><p>Assuming you're using <a href="https://github.com/sstephenson/rbenv">rbenv</a>, you can use <code>tests.sh</code> to
 run the test matrix locally.</p>
-
-<p>Parallelism is not tested with Rails 3.0.x nor 3.1.x due to this
-<a href="https://github.com/rails/rails/issues/7538">known issue</a>.</p>
 
 <h2>
 <a name="change-log" class="anchor" href="#change-log"><span class="octicon octicon-link"></span></a>Change log</h2>
@@ -625,6 +669,8 @@ run the test matrix locally.</p>
 <a name="thanks-to" class="anchor" href="#thanks-to"><span class="octicon octicon-link"></span></a>Thanks to</h2>
 
 <ul>
+<li>The more than 20 engineers around the world that have contributed their time and code to this gem
+(see the <a href="https://github.com/mceachen/closure_tree/blob/master/CHANGELOG.md">changelog</a>!)</li>
 <li><a href="https://github.com/collectiveidea/awesome_nested_set">https://github.com/collectiveidea/awesome_nested_set</a></li>
 <li><a href="https://github.com/patshaughnessy/class_factory">https://github.com/patshaughnessy/class_factory</a></li>
 <li>JetBrains, which provides an <a href="http://www.jetbrains.com/ruby/buy/buy.jsp#openSource">open-source license</a> to
