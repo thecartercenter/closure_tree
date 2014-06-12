@@ -20,6 +20,9 @@ module ClosureTree
         :with_advisory_lock => true
       }.merge(options)
       raise IllegalArgumentException, "name_column can't be 'path'" if options[:name_column] == 'path'
+
+      extend HierarchyMaintenanceSupport.adapter_for_connection(connection)
+
       if order_is_numeric?
         extend NumericOrderSupport.adapter_for_connection(connection)
       end

@@ -61,7 +61,7 @@ module ClosureTree
 
     def rebuild!(called_by_rebuild = false)
       _ct.with_advisory_lock do
-        delete_hierarchy_references unless @was_new_record
+        _ct.delete_hierarchy_references unless @was_new_record
         hierarchy_class.create!(:ancestor => self, :descendant => self, :generations => 0)
         unless root?
           _ct.connection.execute <<-SQL.strip_heredoc
@@ -82,25 +82,6 @@ module ClosureTree
         children.each { |c| c.rebuild!(true) }
 
         _ct_reorder_children if _ct.order_is_numeric? && children.present?
-      end
-    end
-
-    def delete_hierarchy_references
-      _ct.with_advisory_lock do
-        # The crazy double-wrapped sub-subselect works around MySQL's limitation of subselects on the same table that is being mutated.
-        # It shouldn't affect performance of postgresql.
-        # See http://dev.mysql.com/doc/refman/5.0/en/subquery-errors.html
-        # Also: PostgreSQL doesn't support INNER JOIN on DELETE, so we can't use that.
-        _ct.connection.execute <<-SQL.strip_heredoc
-          DELETE FROM #{_ct.quoted_hierarchy_table_name}
-          WHERE descendant_id IN (
-            SELECT DISTINCT descendant_id
-            FROM (SELECT descendant_id
-              FROM #{_ct.quoted_hierarchy_table_name}
-              WHERE ancestor_id = #{_ct.quote(id)}
-            ) AS x )
-            OR descendant_id = #{_ct.quote(id)}
-        SQL
       end
     end
 
