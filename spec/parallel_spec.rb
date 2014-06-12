@@ -43,7 +43,7 @@ describe 'Concurrent creation', if: support_concurrency do
     all_workers = []
     @names = @iterations.times.map { |iter| "iteration ##{iter}" }
     @names.each do |name|
-      wake_time = 1.second.from_now
+      wake_time = 3.seconds.from_now # travis is slow
       workers = @threads.times.map do
         worker_class.new(@target, wake_time, name)
       end
