@@ -1,5 +1,10 @@
 # Changelog
 
+### 4.7.0
+
+ * Support for `cache_child_count` ([pr109](https://github.com/mceachen/closure_tree/pull/109)).
+   Thanks, [Michael Baldry](https://github.com/brightbits)!
+  
 ### 4.6.3
 
  * More goodness from [Abdelkader Boudih](https://github.com/seuros), including rspec 3 support.
