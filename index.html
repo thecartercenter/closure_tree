@@ -54,7 +54,7 @@ and tracking user referrals.</p>
 <a href="https://codeclimate.com/github/mceachen/closure_tree"><img src="https://codeclimate.com/github/mceachen/closure_tree.png" alt="Code Climate"></a>
 <a href="https://gemnasium.com/mceachen/closure_tree"><img src="https://gemnasium.com/mceachen/closure_tree.png" alt="Dependency Status"></a></p>
 
-<p>Substantially more efficient than
+<p>Dramatically more performant than
 <a href="https://github.com/stefankroes/ancestry">ancestry</a> and
 <a href="https://github.com/amerine/acts_as_tree">acts_as_tree</a>, and even more
 awesome than <a href="https://github.com/collectiveidea/awesome_nested_set/">awesome_nested_set</a>,
@@ -81,19 +81,21 @@ closure_tree has some great features:</p>
 <li>3 SQL INSERT/UPDATEs on node reparenting</li>
 </ul>
 </li>
-<li><strong>Support for Rails 3.2, 4.0, and 4.1</strong></li>
-<li><strong>Support for Ruby 1.9 and 2.1 (jRuby and Rubinius are still in development)</strong></li>
-<li>Support for reparenting children (and all their descendants)</li>
-<li>Support for <a href="#concurrency">concurrency</a> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
-<li>Support for polymorphism <a href="#sti">STI</a> within the hierarchy</li>
 <li>
-<code>find_or_create_by_path</code> for <a href="#find_or_create_by_path">building out hierarchies quickly and conveniently</a>
+<strong>Support for <a href="#concurrency">concurrency</a></strong> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
+<li><strong>Support for Rails 3.2, 4.0, and 4.1</strong></li>
+<li>__Support for Ruby 1.9, 2.1, and jRuby 1.6.13</li>
+<li>Support for reparenting children (and all their descendants)</li>
+<li>Support for <a href="#sti">single-table inheritance (STI)</a> within the hierarchy</li>
+<li>
+<code>find_or_create_by_path</code> for <a href="#find_or_create_by_path">building out heterogeneous hierarchies quickly and conveniently</a>
 </li>
-<li>Support for <a href="#deterministic-ordering">deterministic ordering</a> of children</li>
+<li>Support for <a href="#deterministic-ordering">deterministic ordering</a>
+</li>
 <li>Support for <a href="http://en.wikipedia.org/wiki/Tree_traversal#Pre-order">preordered</a> traversal of descendants</li>
 <li>Support for rendering trees in <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language)">DOT format</a>, using <a href="http://www.graphviz.org/">Graphviz</a>
 </li>
-<li>Excellent <a href="#testing">test coverage</a> in a variety of environments</li>
+<li>Excellent <a href="#testing">test coverage</a> in a comprehensive variety of environments</li>
 </ul><p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
 <a href="http://www.slideshare.net/billkarwin/models-for-hierarchical-data">Models for hierarchical data presentation</a>
 for a description of different tree storage algorithms.</p>
@@ -209,30 +211,38 @@ will be added automatically, so you don't need to create it.</p>
 <h3>
 <a name="find_or_create_by_path" class="anchor" href="#find_or_create_by_path"><span class="octicon octicon-link"></span></a>find_or_create_by_path</h3>
 
-<p>We can do all the node creation and add_child calls with one method call:</p>
+<p>You can <code>find</code> as well as <code>find_or_create</code> by "ancestry paths".</p>
+
+<p>If you provide an array of strings to these methods, they reference the <code>name</code> column in your 
+model, which can be overridden with the <code>:name_column</code> option provided to <code>acts_as_tree</code>.</p>
 
 <div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span><span class="s2">"grandparent"</span><span class="p">,</span> <span class="s2">"parent"</span><span class="p">,</span> <span class="s2">"child"</span><span class="o">]</span><span class="p">)</span>
 </pre></div>
 
-<p>You can <code>find</code> as well as <code>find_or_create</code> by "ancestry paths".
-Ancestry paths may be built using any column in your model. The default
-column is <code>name</code>, which can be changed with the :name_column option
-provided to <code>acts_as_tree</code>.</p>
+<p>As of v5.0.0, <code>find_or_create_by_path</code> can also take an array of attribute hashes:</p>
 
-<p>Note that any other AR fields can be set with the second, optional <code>attributes</code> argument,
-and as of version 4.2.0, these attributes are added to the where clause as selection criteria.</p>
-
-<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w{home chuck Photos"}</span><span class="p">,</span> <span class="p">{</span><span class="ss">:tag_type</span> <span class="o">=&gt;</span> <span class="s2">"File"</span><span class="p">})</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Grandparent"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Sr."</span><span class="p">},</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Mrs."</span><span class="p">},</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Child"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Jr."</span><span class="p">}</span>
+<span class="o">]</span><span class="p">)</span>
 </pre></div>
 
-<p>This will pass the attribute hash of <code>{:name =&gt; "home", :tag_type =&gt; "File"}</code> to
-<code>Tag.find_or_create_by_name</code> if the root directory doesn't exist (and
-<code>{:name =&gt; "chuck", :tag_type =&gt; "File"}</code> if the second-level tag doesn't exist, and so on).</p>
+<p>If you're using STI, The attribute hashes can contain the <code>sti_name</code> and things work as expected:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Label</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span>
+  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'2014'</span><span class="p">},</span>
+  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'August'</span><span class="p">},</span>
+  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'5'</span><span class="p">},</span>
+  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'EventLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'Visit the Getty Center'</span><span class="p">}</span>
+<span class="o">]</span><span class="p">)</span>
+</pre></div>
 
 <h3>
 <a name="moving-nodes-around-the-tree" class="anchor" href="#moving-nodes-around-the-tree"><span class="octicon octicon-link"></span></a>Moving nodes around the tree</h3>
 
-<p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the new parent for you:</p>
+<p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the
+new parent for you:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b c d)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(e f g h)</span>
@@ -325,6 +335,8 @@ server may not be happy trying to do this.</p>
 <li>
 <code>:order</code> used to set up <a href="#deterministic-ordering">deterministic ordering</a>
 </li>
+<li>
+<code>:touch</code> delegates to the <code>belongs_to</code> annotation for the parent, so <code>touch</code>ing cascades to all children (the performance of this for deep trees isn't currently optimal).</li>
 </ul><h2>
 <a name="accessing-data" class="anchor" href="#accessing-data"><span class="octicon octicon-link"></span></a>Accessing Data</h2>
 
