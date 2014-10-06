@@ -84,7 +84,7 @@ closure_tree has some great features:</p>
 <li>
 <strong>Support for <a href="#concurrency">concurrency</a></strong> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
 <li><strong>Support for Rails 3.2, 4.0, and 4.1</strong></li>
-<li>__Support for Ruby 1.9, 2.1, and jRuby 1.6.13</li>
+<li><strong>Support for Ruby 1.9, 2.1, and jRuby 1.6.13</strong></li>
 <li>Support for reparenting children (and all their descendants)</li>
 <li>Support for <a href="#sti">single-table inheritance (STI)</a> within the hierarchy</li>
 <li>
@@ -119,14 +119,23 @@ for a description of different tree storage algorithms.</p>
 <p>Note that closure_tree only supports Rails 3.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
 
 <ol>
-<li><p>Add this to your Gemfile: <code>gem 'closure_tree'</code></p></li>
+<li><p>Add <code>gem 'closure_tree'</code> to your Gemfile </p></li>
 <li><p>Run <code>bundle install</code></p></li>
-<li><p>Add <code>acts_as_tree</code> to your hierarchical model(s).
-Make sure you add <code>acts_as_tree</code> *after any <code>attr_accessible</code> and <code>self.table_name =</code>
-lines in your model.
-Please review the <a href="#available-options">available options</a> you can provide.</p></li>
 <li>
-<p>Add a migration to add a <code>parent_id</code> column to the model you want to act_as_tree.
+<p>Add <code>acts_as_tree</code> to your hierarchical model:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">acts_as_tree</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Make sure you check out the <a href="#available-options">large number options</a> that <code>acts_as_tree</code> accepts.</p>
+
+<p>Make sure you add <code>acts_as_tree</code> <strong>after</strong> <code>attr_accessible</code> and
+<code>self.table_name =</code> lines in your model.</p>
+</li>
+<li>
+<p>Add a migration to add a <code>parent_id</code> column to the hierarchical model.
 You may want to also <a href="#sort_order">add a column for deterministic ordering of children</a>, but that's optional.</p>
 
 <div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
@@ -136,32 +145,15 @@ You may want to also <a href="#sort_order">add a column for deterministic orderi
 <span class="k">end</span>
 </pre></div>
 
-<p>Note that if the column is null, the tag will be considered a root node.</p>
+<p>The column must be nullable. Root nodes have a <code>NULL</code> <code>parent_id</code>.</p>
 </li>
 <li>
-<p>Add a database migration to store the hierarchy for your model. By
-default the table name will be the model's table name, followed by
+<p>Run <code>rails g closure_tree:migration tag</code> (and replace <code>tag</code> with your model name)
+to create the closure tree table for your model.</p>
+
+<p>By default the table name will be the model's table name, followed by
 "_hierarchies". Note that by calling <code>acts_as_tree</code>, a "virtual model" (in this case, <code>TagHierarchy</code>)
-will be added automatically, so you don't need to create it.</p>
-
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">CreateTagHierarchies</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
-  <span class="k">def</span> <span class="nf">change</span>
-    <span class="n">create_table</span> <span class="ss">:tag_hierarchies</span><span class="p">,</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
-      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:ancestor_id</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>   <span class="c1"># ID of the parent/grandparent/great-grandparent/... tag</span>
-      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:descendant_id</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span> <span class="c1"># ID of the target tag</span>
-      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:generations</span><span class="p">,</span> <span class="ss">:null</span> <span class="o">=&gt;</span> <span class="kp">false</span>   <span class="c1"># Number of generations between the ancestor and the descendant. Parent/child = 1, for example.</span>
-    <span class="k">end</span>
-
-    <span class="c1"># For "all progeny of…" and leaf selects:</span>
-    <span class="n">add_index</span> <span class="ss">:tag_hierarchies</span><span class="p">,</span> <span class="o">[</span><span class="ss">:ancestor_id</span><span class="p">,</span> <span class="ss">:descendant_id</span><span class="p">,</span> <span class="ss">:generations</span><span class="o">]</span><span class="p">,</span>
-      <span class="ss">:unique</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"tag_anc_desc_udx"</span>
-
-    <span class="c1"># For "all ancestors of…" selects,</span>
-    <span class="n">add_index</span> <span class="ss">:tag_hierarchies</span><span class="p">,</span> <span class="o">[</span><span class="ss">:descendant_id</span><span class="o">]</span><span class="p">,</span>
-      <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"tag_desc_idx"</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</pre></div>
+will be created dynamically. You don't need to create it.</p>
 </li>
 <li><p>Run <code>rake db:migrate</code></p></li>
 <li>
@@ -179,23 +171,23 @@ will be added automatically, so you don't need to create it.</p>
 
 <p>Create a root node:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Grandparent'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Grandparent'</span><span class="p">)</span>
 </pre></div>
 
 <p>Child nodes are created by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Parent'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Parent'</span><span class="p">)</span>
 </pre></div>
 
 <p>Or by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Second Child'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Second Child'</span><span class="p">)</span>
 <span class="n">parent</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">child2</span>
 </pre></div>
 
 <p>Or by calling the "add_child" method:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child3</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'Third Child'</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child3</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Third Child'</span><span class="p">)</span>
 <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span> <span class="n">child3</span>
 </pre></div>
 
@@ -216,15 +208,15 @@ will be added automatically, so you don't need to create it.</p>
 <p>If you provide an array of strings to these methods, they reference the <code>name</code> column in your 
 model, which can be overridden with the <code>:name_column</code> option provided to <code>acts_as_tree</code>.</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span><span class="s2">"grandparent"</span><span class="p">,</span> <span class="s2">"parent"</span><span class="p">,</span> <span class="s2">"child"</span><span class="o">]</span><span class="p">)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w[grandparent parent child]</span><span class="p">)</span>
 </pre></div>
 
 <p>As of v5.0.0, <code>find_or_create_by_path</code> can also take an array of attribute hashes:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Grandparent"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Sr."</span><span class="p">},</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Mrs."</span><span class="p">},</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Child"</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">"Jr."</span><span class="p">}</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Grandparent'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Sr.'</span><span class="p">},</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Parent'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Mrs.'</span><span class="p">},</span>
+  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Child'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Jr.'</span><span class="p">}</span>
 <span class="o">]</span><span class="p">)</span>
 </pre></div>
 
@@ -244,8 +236,8 @@ model, which can be overridden with the <code>:name_column</code> option provide
 <p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the
 new parent for you:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b c d)</span>
-<span class="n">h</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(e f g h)</span>
+<div class="highlight highlight-ruby"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w[a b c d]</span>
+<span class="n">h</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w[e f g h]</span>
 <span class="n">e</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">root</span>
 <span class="n">d</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="c1"># "d.children &lt;&lt; e" would work too, of course</span>
 <span class="n">h</span><span class="o">.</span><span class="n">ancestry_path</span>
@@ -624,7 +616,8 @@ the spec <code>tag_spec.rb</code>:</p>
     <span class="k">end</span>
 </pre></div>
 
-<p><strong>However, if you're just starting with Rails, may I humbly suggest you adopt a factory library</strong>,
+<p>`
+<strong>However, if you're just starting with Rails, may I humbly suggest you adopt a factory library</strong>,
 rather than using fixtures? <a href="https://www.google.com/search?q=fixtures+versus+factories">Lots of people have written about this already</a>.</p>
 
 <h3>
