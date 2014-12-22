@@ -40,10 +40,10 @@
       </nav>
       <section>
         <h1>
-<a name="closure-tree" class="anchor" href="#closure-tree"><span class="octicon octicon-link"></span></a>Closure Tree</h1>
+<a id="closure-tree" class="anchor" href="#closure-tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Closure Tree</h1>
 
 <h3>
-<a name="closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure" class="anchor" href="#closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure"><span class="octicon octicon-link"></span></a>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
+<a id="closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure" class="anchor" href="#closure_tree-lets-your-activerecord-models-act-as-nodes-in-a-tree-data-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Closure_tree lets your ActiveRecord models act as nodes in a <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree data structure</a>
 </h3>
 
 <p>Common applications include modeling hierarchical data, like tags, page graphs in CMSes,
@@ -96,15 +96,18 @@ closure_tree has some great features:</p>
 <li>Support for rendering trees in <a href="http://en.wikipedia.org/wiki/DOT_(graph_description_language)">DOT format</a>, using <a href="http://www.graphviz.org/">Graphviz</a>
 </li>
 <li>Excellent <a href="#testing">test coverage</a> in a comprehensive variety of environments</li>
-</ul><p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
+</ul>
+
+<p>See <a href="http://karwin.blogspot.com/">Bill Karwin</a>'s excellent
 <a href="http://www.slideshare.net/billkarwin/models-for-hierarchical-data">Models for hierarchical data presentation</a>
 for a description of different tree storage algorithms.</p>
 
 <h2>
-<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
+<li><a href="#warning">Warning</a></li>
 <li><a href="#usage">Usage</a></li>
 <li><a href="#accessing-data">Accessing Data</a></li>
 <li><a href="#polymorphic-hierarchies-with-sti">Polymorphic hierarchies with STI</a></li>
@@ -113,8 +116,10 @@ for a description of different tree storage algorithms.</p>
 <li><a href="#faq">FAQ</a></li>
 <li><a href="#testing">Testing</a></li>
 <li><a href="#change-log">Change log</a></li>
-</ul><h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Note that closure_tree only supports Rails 3.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
 
@@ -122,28 +127,33 @@ for a description of different tree storage algorithms.</p>
 <li><p>Add <code>gem 'closure_tree'</code> to your Gemfile </p></li>
 <li><p>Run <code>bundle install</code></p></li>
 <li>
-<p>Add <code>acts_as_tree</code> to your hierarchical model:</p>
+<p>Add <code>has_closure_tree</code> (or <code>acts_as_tree</code>, which is an alias of the same method) to your hierarchical model:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">acts_as_tree</span>
-<span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Tag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
+  has_closure_tree
+<span class="pl-k">end</span>
 
-<p>Make sure you check out the <a href="#available-options">large number options</a> that <code>acts_as_tree</code> accepts.</p>
+<span class="pl-k">class</span> <span class="pl-en">AnotherTag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
+  acts_as_tree
+<span class="pl-k">end</span></pre></div>
 
-<p>Make sure you add <code>acts_as_tree</code> <strong>after</strong> <code>attr_accessible</code> and
+<p>Make sure you check out the <a href="#available-options">large number options</a> that <code>has_closure_tree</code> accepts.</p>
+
+<p>Make sure you add <code>has_closure_tree</code> <strong>after</strong> <code>attr_accessible</code> and
 <code>self.table_name =</code> lines in your model.</p>
+
+<p>If you're already using other hierarchical gems, like <code>ancestry</code> or <code>acts_as_tree</code>, please refer
+to the <a href="#warning">warning section</a>!</p>
 </li>
 <li>
 <p>Add a migration to add a <code>parent_id</code> column to the hierarchical model.
 You may want to also <a href="#sort_order">add a column for deterministic ordering of children</a>, but that's optional.</p>
 
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">AddParentIdToTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
-  <span class="k">def</span> <span class="nf">change</span>
-    <span class="n">add_column</span> <span class="ss">:tag</span><span class="p">,</span> <span class="ss">:parent_id</span><span class="p">,</span> <span class="ss">:integer</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">AddParentIdToTag<span class="pl-e"> &lt; ActiveRecord::Migration</span></span>
+  <span class="pl-k">def</span> <span class="pl-en">change</span>
+    add_column <span class="pl-c1">:tag</span>, <span class="pl-c1">:parent_id</span>, <span class="pl-c1">:integer</span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span></pre></div>
 
 <p>The column must be nullable. Root nodes have a <code>NULL</code> <code>parent_id</code>.</p>
 </li>
@@ -152,7 +162,7 @@ You may want to also <a href="#sort_order">add a column for deterministic orderi
 to create the closure tree table for your model.</p>
 
 <p>By default the table name will be the model's table name, followed by
-"_hierarchies". Note that by calling <code>acts_as_tree</code>, a "virtual model" (in this case, <code>TagHierarchy</code>)
+"_hierarchies". Note that by calling <code>has_closure_tree</code>, a "virtual model" (in this case, <code>TagHierarchy</code>)
 will be created dynamically. You don't need to create it.</p>
 </li>
 <li><p>Run <code>rake db:migrate</code></p></li>
@@ -163,113 +173,121 @@ will be created dynamically. You don't need to create it.</p>
 
 <p>If you're starting from scratch you don't need to call <code>rebuild!</code>.</p>
 </li>
-</ol><h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+</ol>
+
+<h2>
+<a id="warning" class="anchor" href="#warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warning</h2>
+
+<p>As stated above, using multiple hierarchy gems (like <code>ancestry</code> or <code>nested set</code>) on the same model 
+will most likely result in pain, suffering, hair loss, tooth decay, heel-related ailments, and gingivitis.
+Assume things will break. </p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <h3>
-<a name="creation" class="anchor" href="#creation"><span class="octicon octicon-link"></span></a>Creation</h3>
+<a id="creation" class="anchor" href="#creation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creation</h3>
 
 <p>Create a root node:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Grandparent'</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>grandparent <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>Child nodes are created by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">parent</span> <span class="o">=</span> <span class="n">grandparent</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Parent'</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>parent <span class="pl-k">=</span> grandparent.children.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>Or by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Second Child'</span><span class="p">)</span>
-<span class="n">parent</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">child2</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>child2 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Second Child<span class="pl-pds">'</span></span>)
+parent.children <span class="pl-k">&lt;&lt;</span> child2</pre></div>
 
 <p>Or by calling the "add_child" method:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child3</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Third Child'</span><span class="p">)</span>
-<span class="n">parent</span><span class="o">.</span><span class="n">add_child</span> <span class="n">child3</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>child3 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Third Child<span class="pl-pds">'</span></span>)
+parent.add_child child3</pre></div>
 
 <p>Then:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">grandparent</span><span class="o">.</span><span class="n">self_and_descendants</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:name</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"Grandparent"</span><span class="p">,</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="s2">"First Child"</span><span class="p">,</span> <span class="s2">"Second Child"</span><span class="p">,</span> <span class="s2">"Third Child"</span><span class="o">]</span>
+<div class="highlight highlight-ruby"><pre>grandparent.self_and_descendants.collect(<span class="pl-k">&amp;</span><span class="pl-c1">:name</span>)
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Second Child<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Third Child<span class="pl-pds">"</span></span>]
 
-<span class="n">child1</span><span class="o">.</span><span class="n">ancestry_path</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"Grandparent"</span><span class="p">,</span> <span class="s2">"Parent"</span><span class="p">,</span> <span class="s2">"First Child"</span><span class="o">]</span>
-</pre></div>
+child1.ancestry_path
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>]</pre></div>
 
 <h3>
-<a name="find_or_create_by_path" class="anchor" href="#find_or_create_by_path"><span class="octicon octicon-link"></span></a>find_or_create_by_path</h3>
+<a id="find_or_create_by_path" class="anchor" href="#find_or_create_by_path" aria-hidden="true"><span class="octicon octicon-link"></span></a>find_or_create_by_path</h3>
 
 <p>You can <code>find</code> as well as <code>find_or_create</code> by "ancestry paths".</p>
 
 <p>If you provide an array of strings to these methods, they reference the <code>name</code> column in your 
-model, which can be overridden with the <code>:name_column</code> option provided to <code>acts_as_tree</code>.</p>
+model, which can be overridden with the <code>:name_column</code> option provided to <code>has_closure_tree</code>.</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="sx">%w[grandparent parent child]</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path(<span class="pl-s1"><span class="pl-pds">%w[</span>grandparent parent child<span class="pl-pds">]</span></span>)</pre></div>
 
 <p>As of v5.0.0, <code>find_or_create_by_path</code> can also take an array of attribute hashes:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Grandparent'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Sr.'</span><span class="p">},</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Parent'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Mrs.'</span><span class="p">},</span>
-  <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Child'</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">'Jr.'</span><span class="p">}</span>
-<span class="o">]</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path([
+  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Sr.<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Mrs.<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Child<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Jr.<span class="pl-pds">'</span></span>}
+])</pre></div>
 
 <p>If you're using STI, The attribute hashes can contain the <code>sti_name</code> and things work as expected:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">child</span> <span class="o">=</span> <span class="no">Label</span><span class="o">.</span><span class="n">find_or_create_by_path</span><span class="p">(</span><span class="o">[</span>
-  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'2014'</span><span class="p">},</span>
-  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'August'</span><span class="p">},</span>
-  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'DateLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'5'</span><span class="p">},</span>
-  <span class="p">{</span><span class="ss">type</span><span class="p">:</span> <span class="s1">'EventLabel'</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">'Visit the Getty Center'</span><span class="p">}</span>
-<span class="o">]</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Label</span>.find_or_create_by_path([
+  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>2014<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>August<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>5<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>EventLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Visit the Getty Center<span class="pl-pds">'</span></span>}
+])</pre></div>
 
 <h3>
-<a name="moving-nodes-around-the-tree" class="anchor" href="#moving-nodes-around-the-tree"><span class="octicon octicon-link"></span></a>Moving nodes around the tree</h3>
+<a id="moving-nodes-around-the-tree" class="anchor" href="#moving-nodes-around-the-tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Moving nodes around the tree</h3>
 
 <p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the
 new parent for you:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">d</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w[a b c d]</span>
-<span class="n">h</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w[e f g h]</span>
-<span class="n">e</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">root</span>
-<span class="n">d</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="c1"># "d.children &lt;&lt; e" would work too, of course</span>
-<span class="n">h</span><span class="o">.</span><span class="n">ancestry_path</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"g"</span><span class="p">,</span> <span class="s2">"h"</span><span class="o">]</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>d <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w[</span>a b c d<span class="pl-pds">]</span></span>
+h <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w[</span>e f g h<span class="pl-pds">]</span></span>
+e <span class="pl-k">=</span> h.root
+d.add_child(e) <span class="pl-c"># "d.children &lt;&lt; e" would work too, of course</span>
+h.ancestry_path
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>e<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>f<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>g<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>h<span class="pl-pds">"</span></span>]</pre></div>
+
+<p>When it is more convenient to simply change the <code>parent_id</code> of a node directly (for example, when dealing with a form <code>&lt;select&gt;</code>), closure_tree will handle the necessary changes automatically when the record is saved:</p>
+
+<div class="highlight highlight-ruby"><pre>j <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find <span class="pl-c1">102</span>
+j.self_and_ancestor_ids
+=&gt; [<span class="pl-c1">102</span>, <span class="pl-c1">87</span>, <span class="pl-c1">77</span>]
+j.update <span class="pl-c1">parent_id:</span> <span class="pl-c1">96</span>
+j.self_and_ancestor_ids
+=&gt; [<span class="pl-c1">102</span>, <span class="pl-c1">96</span>, <span class="pl-c1">95</span>, <span class="pl-c1">78</span>]</pre></div>
 
 <h3>
-<a name="nested-hashes" class="anchor" href="#nested-hashes"><span class="octicon octicon-link"></span></a>Nested hashes</h3>
+<a id="nested-hashes" class="anchor" href="#nested-hashes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nested hashes</h3>
 
 <p><code>hash_tree</code> provides a method for rendering a subtree as an
 ordered nested hash:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">b</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b)</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">b2</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(a b2)</span>
-<span class="n">d1</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(c1 d1)</span>
-<span class="n">c1</span> <span class="o">=</span> <span class="n">d1</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">d2</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">find_or_create_by_path</span> <span class="sx">%w(c2 d2)</span>
-<span class="n">c2</span> <span class="o">=</span> <span class="n">d2</span><span class="o">.</span><span class="n">parent</span>
+<div class="highlight highlight-ruby"><pre>b <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>a b<span class="pl-pds">)</span></span>
+a <span class="pl-k">=</span> b.parent
+b2 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>a b2<span class="pl-pds">)</span></span>
+d1 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>c1 d1<span class="pl-pds">)</span></span>
+c1 <span class="pl-k">=</span> d1.parent
+d2 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>c2 d2<span class="pl-pds">)</span></span>
+c2 <span class="pl-k">=</span> d2.parent
 
-<span class="no">Tag</span><span class="o">.</span><span class="n">hash_tree</span>
-<span class="o">=&gt;</span> <span class="p">{</span><span class="n">a</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">b</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">c1</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">d1</span> <span class="o">=&gt;</span> <span class="p">{}},</span> <span class="n">c2</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">d2</span> <span class="o">=&gt;</span> <span class="p">{}}},</span> <span class="n">b2</span> <span class="o">=&gt;</span> <span class="p">{}}}</span>
+<span class="pl-s3">Tag</span>.hash_tree
+=&gt; {a =&gt; {b =&gt; {c1 =&gt; {d1 =&gt; {}}, c2 =&gt; {d2 =&gt; {}}}, b2 =&gt; {}}}
 
-<span class="no">Tag</span><span class="o">.</span><span class="n">hash_tree</span><span class="p">(</span><span class="ss">:limit_depth</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="p">{</span><span class="n">a</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">b</span> <span class="o">=&gt;</span> <span class="p">{},</span> <span class="n">b2</span> <span class="o">=&gt;</span> <span class="p">{}}}</span>
+<span class="pl-s3">Tag</span>.hash_tree(<span class="pl-c1">:limit_depth</span> =&gt; <span class="pl-c1">2</span>)
+=&gt; {a =&gt; {b =&gt; {}, b2 =&gt; {}}}
 
-<span class="n">b</span><span class="o">.</span><span class="n">hash_tree</span>
-<span class="o">=&gt;</span> <span class="p">{</span><span class="n">b</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">c1</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">d1</span> <span class="o">=&gt;</span> <span class="p">{}},</span> <span class="n">c2</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">d2</span> <span class="o">=&gt;</span> <span class="p">{}}}}</span>
+b.hash_tree
+=&gt; {b =&gt; {c1 =&gt; {d1 =&gt; {}}, c2 =&gt; {d2 =&gt; {}}}}
 
-<span class="n">b</span><span class="o">.</span><span class="n">hash_tree</span><span class="p">(</span><span class="ss">:limit_depth</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="p">{</span><span class="n">b</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="n">c1</span> <span class="o">=&gt;</span> <span class="p">{},</span> <span class="n">c2</span> <span class="o">=&gt;</span> <span class="p">{}}}</span>
-</pre></div>
+b.hash_tree(<span class="pl-c1">:limit_depth</span> =&gt; <span class="pl-c1">2</span>)
+=&gt; {b =&gt; {c1 =&gt; {}, c2 =&gt; {}}}</pre></div>
 
 <p><strong>If your tree is large (or might become so), use :limit_depth.</strong></p>
 
@@ -279,14 +297,13 @@ server may not be happy trying to do this.</p>
 <p>HT: <a href="https://github.com/stefankroes/ancestry#arrangement">ancestry</a> and <a href="https://github.com/mceachen/closure_tree/issues/11">elhoyos</a></p>
 
 <h3>
-<a name="graph-visualization" class="anchor" href="#graph-visualization"><span class="octicon octicon-link"></span></a>Graph visualization</h3>
+<a id="graph-visualization" class="anchor" href="#graph-visualization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graph visualization</h3>
 
 <p><code>to_dot_digraph</code> is suitable for passing into <a href="http://www.graphviz.org/">Graphviz</a>.</p>
 
 <p>For example, for the above tree, write out the DOT file with ruby:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"example.dot"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="no">Tag</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">to_dot_digraph</span><span class="p">)</span> <span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-s3">File</span>.open(<span class="pl-s1"><span class="pl-pds">"</span>example.dot<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>w<span class="pl-pds">"</span></span>) { |<span class="pl-vo">f</span>| f.write(<span class="pl-s3">Tag</span>.root.to_dot_digraph) }</pre></div>
 
 <p>Then, in a shell, <code>dot -Tpng example.dot &gt; example.png</code>, which produces:</p>
 
@@ -299,9 +316,9 @@ server may not be happy trying to do this.</p>
 <p><img src="https://raw.github.com/mceachen/closure_tree/master/img/preorder.png" alt="Preordered test tree"></p>
 
 <h3>
-<a name="available-options" class="anchor" href="#available-options"><span class="octicon octicon-link"></span></a>Available options</h3>
+<a id="available-options" class="anchor" href="#available-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Available options</h3>
 
-<p>When you include <code>acts_as_tree</code> in your model, you can provide a hash to override the following defaults:</p>
+<p>When you include <code>has_closure_tree</code> in your model, you can provide a hash to override the following defaults:</p>
 
 <ul>
 <li>
@@ -329,11 +346,13 @@ server may not be happy trying to do this.</p>
 </li>
 <li>
 <code>:touch</code> delegates to the <code>belongs_to</code> annotation for the parent, so <code>touch</code>ing cascades to all children (the performance of this for deep trees isn't currently optimal).</li>
-</ul><h2>
-<a name="accessing-data" class="anchor" href="#accessing-data"><span class="octicon octicon-link"></span></a>Accessing Data</h2>
+</ul>
+
+<h2>
+<a id="accessing-data" class="anchor" href="#accessing-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Accessing Data</h2>
 
 <h3>
-<a name="class-methods" class="anchor" href="#class-methods"><span class="octicon octicon-link"></span></a>Class methods</h3>
+<a id="class-methods" class="anchor" href="#class-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Class methods</h3>
 
 <ul>
 <li>
@@ -352,8 +371,10 @@ server may not be happy trying to do this.</p>
 <code>Tag.find_all_by_generation(generation_level)</code> returns the descendant nodes who are <code>generation_level</code> away from a root. <code>Tag.find_all_by_generation(0)</code> is equivalent to <code>Tag.roots</code>.</li>
 <li>
 <code>Tag.with_ancestor(ancestors)</code> scopes to all descendants whose ancestor is in the given list.</li>
-</ul><h3>
-<a name="instance-methods" class="anchor" href="#instance-methods"><span class="octicon octicon-link"></span></a>Instance methods</h3>
+</ul>
+
+<h3>
+<a id="instance-methods" class="anchor" href="#instance-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Instance methods</h3>
 
 <ul>
 <li>
@@ -417,65 +438,63 @@ server may not be happy trying to do this.</p>
 </ul>
 </li>
 <li>
-<code>tag.destroy</code> will destroy a node and do <em>something</em> to its children, which is determined by the <code>:dependent</code> option passed to <code>acts_as_tree</code>.</li>
-</ul><h2>
-<a name="polymorphic-hierarchies-with-sti" class="anchor" href="#polymorphic-hierarchies-with-sti"><span class="octicon octicon-link"></span></a>Polymorphic hierarchies with STI</h2>
+<code>tag.destroy</code> will destroy a node and do <em>something</em> to its children, which is determined by the <code>:dependent</code> option passed to <code>has_closure_tree</code>.</li>
+</ul>
+
+<h2>
+<a id="polymorphic-hierarchies-with-sti" class="anchor" href="#polymorphic-hierarchies-with-sti" aria-hidden="true"><span class="octicon octicon-link"></span></a>Polymorphic hierarchies with STI</h2>
 
 <p>Polymorphic models using single table inheritance (STI) are supported:</p>
 
 <ol>
 <li>Create a db migration that adds a String <code>type</code> column to your model</li>
-<li>Subclass the model class. You only need to add <code>acts_as_tree</code> to your base class:</li>
-</ol><div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">acts_as_tree</span>
-<span class="k">end</span>
-<span class="k">class</span> <span class="nc">WhenTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
-<span class="k">class</span> <span class="nc">WhereTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
-<span class="k">class</span> <span class="nc">WhatTag</span> <span class="o">&lt;</span> <span class="no">Tag</span> <span class="p">;</span> <span class="k">end</span>
-</pre></div>
+<li>Subclass the model class. You only need to add <code>has_closure_tree</code> to your base class:</li>
+</ol>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Tag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
+  has_closure_tree
+<span class="pl-k">end</span>
+<span class="pl-k">class</span> <span class="pl-en">WhenTag<span class="pl-e"> &lt; Tag</span></span> ; <span class="pl-k">end</span>
+<span class="pl-k">class</span> <span class="pl-en">WhereTag<span class="pl-e"> &lt; Tag</span></span> ; <span class="pl-k">end</span>
+<span class="pl-k">class</span> <span class="pl-en">WhatTag<span class="pl-e"> &lt; Tag</span></span> ; <span class="pl-k">end</span></pre></div>
 
 <p>Please note that Rails (&lt;= 3.2) doesn't handle polymorphic associations correctly if
 you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="c1"># BAD: ActiveRecord ignores the :type attribute:</span>
-<span class="n">root</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"child"</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s2">"WhenTag"</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># BAD: ActiveRecord ignores the :type attribute:</span>
+root.children.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>child<span class="pl-pds">"</span></span>, <span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">"</span>WhenTag<span class="pl-pds">"</span></span>)</pre></div>
 
 <p>Instead, use either <code>.add_child</code> or <code>children &lt;&lt;</code>:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="c1"># GOOD!</span>
-<span class="n">a</span> <span class="o">=</span> <span class="no">Tag</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"a"</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="no">WhenTag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"b"</span><span class="p">)</span>
-<span class="n">a</span><span class="o">.</span><span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">b</span>
-<span class="n">c</span> <span class="o">=</span> <span class="no">WhatTag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"c"</span><span class="p">)</span>
-<span class="n">b</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># GOOD!</span>
+a <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.create!(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>)
+b <span class="pl-k">=</span> <span class="pl-s3">WhenTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>)
+a.children <span class="pl-k">&lt;&lt;</span> b
+c <span class="pl-k">=</span> <span class="pl-s3">WhatTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>)
+b.add_child(c)</pre></div>
 
 <p>See <a href="https://github.com/mceachen/closure_tree/issues/43">issue 43</a> for more information.</p>
 
 <h2>
-<a name="deterministic-ordering" class="anchor" href="#deterministic-ordering"><span class="octicon octicon-link"></span></a>Deterministic ordering</h2>
+<a id="deterministic-ordering" class="anchor" href="#deterministic-ordering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deterministic ordering</h2>
 
 <p>By default, children will be ordered by your database engine, which may not be what you want.</p>
 
 <p>If you want to order children alphabetically, and your model has a <code>name</code> column, you'd do this:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'name'</span>
-<span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Tag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
+  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>
+<span class="pl-k">end</span></pre></div>
 
 <p>If you want a specific order, add a new integer column to your model in a migration:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:sort_order</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>t.integer <span class="pl-c1">:sort_order</span></pre></div>
 
 <p>and in your model:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">OrderedTag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">acts_as_tree</span> <span class="ss">:order</span> <span class="o">=&gt;</span> <span class="s1">'sort_order'</span>
-<span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">OrderedTag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
+  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s1"><span class="pl-pds">'</span>sort_order<span class="pl-pds">'</span></span>
+<span class="pl-k">end</span></pre></div>
 
 <p>When you enable <code>order</code>, you'll also have the following new methods injected into your model:</p>
 
@@ -490,7 +509,9 @@ element in scope will be the sibling immediately before <code>self</code>
 whose sort order column is more than <code>self</code>. These will be ordered properly, so the <code>first</code>
 element in scope will be the sibling immediately "after" <code>self</code>
 </li>
-</ul><p>If your <code>order</code> column is an integer attribute, you'll also have these:</p>
+</ul>
+
+<p>If your <code>order</code> column is an integer attribute, you'll also have these:</p>
 
 <ul>
 <li><p>The class method <code>#roots_and_descendants_preordered</code>, which returns all nodes in your tree,
@@ -534,33 +555,34 @@ Note that all of <code>node1</code>'s children's sort_orders will be incremented
 <li>increment the order_column of all children of node1's parents whose order_column is &gt;= node2's new value by 1.</li>
 </ol>
 </li>
-</ul><div class="highlight highlight-ruby"><pre>
-<span class="n">root</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'root'</span><span class="p">)</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">append_child</span><span class="p">(</span><span class="no">Label</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'a'</span><span class="p">))</span>
-<span class="n">b</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'b'</span><span class="p">)</span>
-<span class="n">c</span> <span class="o">=</span> <span class="no">OrderedTag</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">)</span>
+</ul>
 
-<span class="c1"># We have to call 'root.reload.children' because root won't be in sync with the database otherwise:</span>
+<div class="highlight highlight-ruby"><pre>
+root <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>)
+a <span class="pl-k">=</span> root.append_child(<span class="pl-s3">Label</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>))
+b <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>)
+c <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>c<span class="pl-pds">'</span></span>)
 
-<span class="n">a</span><span class="o">.</span><span class="n">append_sibling</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="n">root</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="o">]</span>
+<span class="pl-c"># We have to call 'root.reload.children' because root won't be in sync with the database otherwise:</span>
 
-<span class="n">a</span><span class="o">.</span><span class="n">prepend_sibling</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="n">root</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"b"</span><span class="p">,</span> <span class="s2">"a"</span><span class="o">]</span>
+a.append_sibling(b)
+root.reload.children.pluck(<span class="pl-c1">:name</span>)
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>]
 
-<span class="n">a</span><span class="o">.</span><span class="n">append_sibling</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-<span class="n">root</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"b"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"c"</span><span class="o">]</span>
+a.prepend_sibling(b)
+root.reload.children.pluck(<span class="pl-c1">:name</span>)
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]
 
-<span class="n">b</span><span class="o">.</span><span class="n">append_sibling</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-<span class="n">root</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
-<span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">,</span> <span class="s2">"a"</span><span class="o">]</span>
-</pre></div>
+a.append_sibling(c)
+root.reload.children.pluck(<span class="pl-c1">:name</span>)
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>]
+
+b.append_sibling(c)
+root.reload.children.pluck(<span class="pl-c1">:name</span>)
+=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]</pre></div>
 
 <h2>
-<a name="concurrency" class="anchor" href="#concurrency"><span class="octicon octicon-link"></span></a>Concurrency</h2>
+<a id="concurrency" class="anchor" href="#concurrency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Concurrency</h2>
 
 <p>Several methods, especially <code>#rebuild</code> and <code>#find_or_create_by_path</code>, cannot run concurrently correctly.
 <code>#find_or_create_by_path</code>, for example, may create duplicate nodes.</p>
@@ -571,31 +593,30 @@ for both MySQL and PostgreSQL, <a href="https://github.com/mceachen/with_advisor
 is used automatically to ensure correctness.</p>
 
 <p>If you are already managing concurrency elsewhere in your application, and want to disable the use
-of with_advisory_lock, pass <code>:with_advisory_lock =&gt; false</code> in the options hash:</p>
+of with_advisory_lock, pass <code>with_advisory_lock: false</code> in the options hash:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Tag</span>
-  <span class="n">acts_as_tree</span> <span class="ss">:with_advisory_lock</span> <span class="o">=&gt;</span> <span class="kp">false</span>
-<span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Tag</span>
+  has_closure_tree <span class="pl-c1">with_advisory_lock:</span> <span class="pl-c1">false</span>
+<span class="pl-k">end</span></pre></div>
 
 <p>Note that you <em>will eventually have data corruption</em> if you disable advisory locks, write to your
 database with multiple threads, and don't provide an alternative mutex.</p>
 
 <h2>
-<a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
 
 <h3>
-<a name="are-there-any-how-to-articles-on-how-to-use-this-gem" class="anchor" href="#are-there-any-how-to-articles-on-how-to-use-this-gem"><span class="octicon octicon-link"></span></a>Are there any how-to articles on how to use this gem?</h3>
+<a id="are-there-any-how-to-articles-on-how-to-use-this-gem" class="anchor" href="#are-there-any-how-to-articles-on-how-to-use-this-gem" aria-hidden="true"><span class="octicon octicon-link"></span></a>Are there any how-to articles on how to use this gem?</h3>
 
 <p>Yup! <a href="https://github.com/bodrovis">Ilya Bodrov</a> wrote <a href="http://www.sitepoint.com/nested-comments-rails/">Nested Comments with Rails</a>.</p>
 
 <h3>
-<a name="does-this-work-well-with-default_scope" class="anchor" href="#does-this-work-well-with-default_scope"><span class="octicon octicon-link"></span></a>Does this work well with <code>#default_scope</code>?</h3>
+<a id="does-this-work-well-with-default_scope" class="anchor" href="#does-this-work-well-with-default_scope" aria-hidden="true"><span class="octicon octicon-link"></span></a>Does this work well with <code>#default_scope</code>?</h3>
 
 <p>No. Please see <a href="https://github.com/mceachen/closure_tree/issues/86">issue 86</a> for details.</p>
 
 <h3>
-<a name="does-this-gem-support-multiple-parents" class="anchor" href="#does-this-gem-support-multiple-parents"><span class="octicon octicon-link"></span></a>Does this gem support multiple parents?</h3>
+<a id="does-this-gem-support-multiple-parents" class="anchor" href="#does-this-gem-support-multiple-parents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Does this gem support multiple parents?</h3>
 
 <p>No. This gem's API is based on the assumption that each node has either 0 or 1 parent.</p>
 
@@ -603,25 +624,24 @@ database with multiple threads, and don't provide an alternative mutex.</p>
 breaking-API changes to support it. I'm open to suggestions and pull requests.</p>
 
 <h3>
-<a name="how-do-i-use-this-with-test-fixtures" class="anchor" href="#how-do-i-use-this-with-test-fixtures"><span class="octicon octicon-link"></span></a>How do I use this with test fixtures?</h3>
+<a id="how-do-i-use-this-with-test-fixtures" class="anchor" href="#how-do-i-use-this-with-test-fixtures" aria-hidden="true"><span class="octicon octicon-link"></span></a>How do I use this with test fixtures?</h3>
 
 <p>Test fixtures aren't going to be running your <code>after_save</code> hooks after inserting all your
 fixture data, so you need to call <code>.rebuild!</code> before your test runs. There's an example in
 the spec <code>tag_spec.rb</code>:</p>
 
-<div class="highlight highlight-ruby"><pre>  <span class="n">describe</span> <span class="s2">"Tag with fixtures"</span> <span class="k">do</span>
-    <span class="n">fixtures</span> <span class="ss">:tags</span>
-    <span class="n">before</span> <span class="ss">:each</span> <span class="k">do</span>
-      <span class="no">Tag</span><span class="o">.</span><span class="n">rebuild!</span> <span class="c1"># &lt;- required if you use fixtures</span>
-    <span class="k">end</span>
-</pre></div>
+<div class="highlight highlight-ruby"><pre>  describe <span class="pl-s1"><span class="pl-pds">"</span>Tag with fixtures<span class="pl-pds">"</span></span> <span class="pl-k">do</span>
+    fixtures <span class="pl-c1">:tags</span>
+    before <span class="pl-c1">:each</span> <span class="pl-k">do</span>
+      <span class="pl-s3">Tag</span>.rebuild! <span class="pl-c"># &lt;- required if you use fixtures</span>
+    <span class="pl-k">end</span></pre></div>
 
 <p>`
 <strong>However, if you're just starting with Rails, may I humbly suggest you adopt a factory library</strong>,
 rather than using fixtures? <a href="https://www.google.com/search?q=fixtures+versus+factories">Lots of people have written about this already</a>.</p>
 
 <h3>
-<a name="there-are-many-lock--files-in-my-project-directory-after-test-runs" class="anchor" href="#there-are-many-lock--files-in-my-project-directory-after-test-runs"><span class="octicon octicon-link"></span></a>There are many <code>lock-*</code> files in my project directory after test runs</h3>
+<a id="there-are-many-lock--files-in-my-project-directory-after-test-runs" class="anchor" href="#there-are-many-lock--files-in-my-project-directory-after-test-runs" aria-hidden="true"><span class="octicon octicon-link"></span></a>There are many <code>lock-*</code> files in my project directory after test runs</h3>
 
 <p>This is expected if you aren't using MySQL or Postgresql for your tests.</p>
 
@@ -630,48 +650,46 @@ if the <code>FLOCK_DIR</code> is set consistently for all ruby processes.</p>
 
 <p>In your <code>spec_helper.rb</code> or <code>minitest_helper.rb</code>, add a <code>before</code> and <code>after</code> block:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">before</span> <span class="k">do</span>
-  <span class="no">ENV</span><span class="o">[</span><span class="s1">'FLOCK_DIR'</span><span class="o">]</span> <span class="o">=</span> <span class="no">Dir</span><span class="o">.</span><span class="n">mktmpdir</span>
-<span class="k">end</span>
+<div class="highlight highlight-ruby"><pre>before <span class="pl-k">do</span>
+  <span class="pl-vo">ENV</span>[<span class="pl-s1"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s3">Dir</span>.mktmpdir
+<span class="pl-k">end</span>
 
-<span class="n">after</span> <span class="k">do</span>
-  <span class="no">FileUtils</span><span class="o">.</span><span class="n">remove_entry_secure</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">'FLOCK_DIR'</span><span class="o">]</span>
-<span class="k">end</span>
-</pre></div>
+after <span class="pl-k">do</span>
+  <span class="pl-s3">FileUtils</span>.remove_entry_secure <span class="pl-vo">ENV</span>[<span class="pl-s1"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>]
+<span class="pl-k">end</span></pre></div>
 
 <h2>
-<a name="testing-with-closure-tree" class="anchor" href="#testing-with-closure-tree"><span class="octicon octicon-link"></span></a>Testing with Closure Tree</h2>
+<a id="testing-with-closure-tree" class="anchor" href="#testing-with-closure-tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing with Closure Tree</h2>
 
 <p>Closure tree comes with some RSpec2/3 matchers which you may use for your tests:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'spec_helper'</span>
-<span class="nb">require</span> <span class="s1">'closure_tree/test/matcher'</span>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>spec_helper<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>closure_tree/test/matcher<span class="pl-pds">'</span></span>
 
-<span class="n">describe</span> <span class="no">Category</span> <span class="k">do</span>
- <span class="c1"># Should syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span> <span class="p">}</span>
- <span class="c1"># Expect syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span> <span class="p">}</span>
-<span class="k">end</span>
+describe <span class="pl-vo">Category</span> <span class="pl-k">do</span>
+ <span class="pl-c"># Should syntax</span>
+ it { should be_a_closure_tree }
+ <span class="pl-c"># Expect syntax</span>
+ it { is_expected.to be_a_closure_tree }
+<span class="pl-k">end</span>
 
-<span class="n">describe</span> <span class="no">Label</span> <span class="k">do</span>
- <span class="c1"># Should syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span> <span class="p">}</span>
- <span class="c1"># Expect syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span> <span class="p">}</span>
-<span class="k">end</span>
+describe <span class="pl-vo">Label</span> <span class="pl-k">do</span>
+ <span class="pl-c"># Should syntax</span>
+ it { should be_a_closure_tree.ordered }
+ <span class="pl-c"># Expect syntax</span>
+ it { is_expected.to be_a_closure_tree.ordered }
+<span class="pl-k">end</span>
 
-<span class="n">describe</span> <span class="no">TodoList</span><span class="o">::</span><span class="no">Item</span> <span class="k">do</span>
- <span class="c1"># Should syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span><span class="p">(</span><span class="ss">:priority_order</span><span class="p">)</span> <span class="p">}</span>
- <span class="c1"># Expect syntax</span>
- <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_a_closure_tree</span><span class="o">.</span><span class="n">ordered</span><span class="p">(</span><span class="ss">:priority_order</span><span class="p">)</span> <span class="p">}</span>
-<span class="k">end</span>
-
+describe <span class="pl-s3">TodoList</span>::<span class="pl-vo">Item</span> <span class="pl-k">do</span>
+ <span class="pl-c"># Should syntax</span>
+ it { should be_a_closure_tree.ordered(<span class="pl-c1">:priority_order</span>) }
+ <span class="pl-c"># Expect syntax</span>
+ it { is_expected.to be_a_closure_tree.ordered(<span class="pl-c1">:priority_order</span>) }
+<span class="pl-k">end</span>
 </pre></div>
 
 <h2>
-<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+<a id="testing" class="anchor" href="#testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing</h2>
 
 <p>Closure tree is <a href="http://travis-ci.org/#!/mceachen/closure_tree">tested under every valid combination</a> of</p>
 
@@ -681,16 +699,18 @@ if the <code>FLOCK_DIR</code> is set consistently for all ruby processes.</p>
 <li>jRuby 1.9mode (and sometimes head)</li>
 <li>The latest Rails 3.2, 4.0, 4.1 and master branches</li>
 <li>Concurrency tests for MySQL and PostgreSQL. SQLite is tested in a single-threaded environment.</li>
-</ul><p>Assuming you're using <a href="https://github.com/sstephenson/rbenv">rbenv</a>, you can use <code>tests.sh</code> to
+</ul>
+
+<p>Assuming you're using <a href="https://github.com/sstephenson/rbenv">rbenv</a>, you can use <code>tests.sh</code> to
 run the test matrix locally.</p>
 
 <h2>
-<a name="change-log" class="anchor" href="#change-log"><span class="octicon octicon-link"></span></a>Change log</h2>
+<a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span class="octicon octicon-link"></span></a>Change log</h2>
 
 <p>See the <a href="https://github.com/mceachen/closure_tree/blob/master/CHANGELOG.md">change log</a>.</p>
 
 <h2>
-<a name="thanks-to" class="anchor" href="#thanks-to"><span class="octicon octicon-link"></span></a>Thanks to</h2>
+<a id="thanks-to" class="anchor" href="#thanks-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks to</h2>
 
 <ul>
 <li>The more than 20 engineers around the world that have contributed their time and code to this gem
