@@ -1,45 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Closure tree by mceachen</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Closure tree</h1>
+      <h2 class="project-tagline">Easily and efficiently make your ActiveRecord model support hierarchies</h2>
+      <a href="https://github.com/mceachen/closure_tree" class="btn">View on GitHub</a>
+      <a href="https://github.com/mceachen/closure_tree/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/mceachen/closure_tree/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-      <header>
-        <h1>Closure tree</h1>
-        <p>Easily and efficiently make your ActiveRecord model support hierarchies</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/mceachen/closure_tree" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/mceachen/closure_tree/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/mceachen/closure_tree/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="closure-tree" class="anchor" href="#closure-tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Closure Tree</h1>
 
 <h3>
@@ -190,29 +170,29 @@ Assume things will break. </p>
 
 <p>Create a root node:</p>
 
-<div class="highlight highlight-ruby"><pre>grandparent <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>)</pre></div>
+<div class="highlight highlight-ruby"><pre>grandparent <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>Child nodes are created by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre>parent <span class="pl-k">=</span> grandparent.children.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>)</pre></div>
+<div class="highlight highlight-ruby"><pre>parent <span class="pl-k">=</span> grandparent.children.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>Or by appending to the children collection:</p>
 
-<div class="highlight highlight-ruby"><pre>child2 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Second Child<span class="pl-pds">'</span></span>)
+<div class="highlight highlight-ruby"><pre>child2 <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Second Child<span class="pl-pds">'</span></span>)
 parent.children <span class="pl-k">&lt;&lt;</span> child2</pre></div>
 
 <p>Or by calling the "add_child" method:</p>
 
-<div class="highlight highlight-ruby"><pre>child3 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Third Child<span class="pl-pds">'</span></span>)
+<div class="highlight highlight-ruby"><pre>child3 <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Third Child<span class="pl-pds">'</span></span>)
 parent.add_child child3</pre></div>
 
 <p>Then:</p>
 
 <div class="highlight highlight-ruby"><pre>grandparent.self_and_descendants.collect(<span class="pl-k">&amp;</span><span class="pl-c1">:name</span>)
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Second Child<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Third Child<span class="pl-pds">"</span></span>]
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Second Child<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Third Child<span class="pl-pds">"</span></span>]
 
 child1.ancestry_path
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>]</pre></div>
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>Grandparent<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Parent<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>First Child<span class="pl-pds">"</span></span>]</pre></div>
 
 <h3>
 <a id="find_or_create_by_path" class="anchor" href="#find_or_create_by_path" aria-hidden="true"><span class="octicon octicon-link"></span></a>find_or_create_by_path</h3>
@@ -222,23 +202,23 @@ child1.ancestry_path
 <p>If you provide an array of strings to these methods, they reference the <code>name</code> column in your 
 model, which can be overridden with the <code>:name_column</code> option provided to <code>has_closure_tree</code>.</p>
 
-<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path(<span class="pl-s1"><span class="pl-pds">%w[</span>grandparent parent child<span class="pl-pds">]</span></span>)</pre></div>
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path(<span class="pl-s"><span class="pl-pds">%w[</span>grandparent parent child<span class="pl-pds">]</span></span>)</pre></div>
 
 <p>As of v5.0.0, <code>find_or_create_by_path</code> can also take an array of attribute hashes:</p>
 
-<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path([
-  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Sr.<span class="pl-pds">'</span></span>},
-  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Mrs.<span class="pl-pds">'</span></span>},
-  {<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Child<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s1"><span class="pl-pds">'</span>Jr.<span class="pl-pds">'</span></span>}
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path([
+  {<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Grandparent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>Sr.<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Parent<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>Mrs.<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Child<span class="pl-pds">'</span></span>, <span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>Jr.<span class="pl-pds">'</span></span>}
 ])</pre></div>
 
 <p>If you're using STI, The attribute hashes can contain the <code>sti_name</code> and things work as expected:</p>
 
-<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-s3">Label</span>.find_or_create_by_path([
-  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>2014<span class="pl-pds">'</span></span>},
-  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>August<span class="pl-pds">'</span></span>},
-  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>5<span class="pl-pds">'</span></span>},
-  {<span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">'</span>EventLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>Visit the Getty Center<span class="pl-pds">'</span></span>}
+<div class="highlight highlight-ruby"><pre>child <span class="pl-k">=</span> <span class="pl-c1">Label</span>.find_or_create_by_path([
+  {<span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>2014<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>August<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">'</span>DateLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>5<span class="pl-pds">'</span></span>},
+  {<span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">'</span>EventLabel<span class="pl-pds">'</span></span>, <span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>Visit the Getty Center<span class="pl-pds">'</span></span>}
 ])</pre></div>
 
 <h3>
@@ -247,16 +227,16 @@ model, which can be overridden with the <code>:name_column</code> option provide
 <p>Nodes can be moved around to other parents, and closure_tree moves the node's descendancy to the
 new parent for you:</p>
 
-<div class="highlight highlight-ruby"><pre>d <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w[</span>a b c d<span class="pl-pds">]</span></span>
-h <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w[</span>e f g h<span class="pl-pds">]</span></span>
+<div class="highlight highlight-ruby"><pre>d <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w[</span>a b c d<span class="pl-pds">]</span></span>
+h <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w[</span>e f g h<span class="pl-pds">]</span></span>
 e <span class="pl-k">=</span> h.root
 d.add_child(e) <span class="pl-c"># "d.children &lt;&lt; e" would work too, of course</span>
 h.ancestry_path
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>e<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>f<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>g<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>h<span class="pl-pds">"</span></span>]</pre></div>
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>e<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>f<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>g<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>h<span class="pl-pds">"</span></span>]</pre></div>
 
 <p>When it is more convenient to simply change the <code>parent_id</code> of a node directly (for example, when dealing with a form <code>&lt;select&gt;</code>), closure_tree will handle the necessary changes automatically when the record is saved:</p>
 
-<div class="highlight highlight-ruby"><pre>j <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find <span class="pl-c1">102</span>
+<div class="highlight highlight-ruby"><pre>j <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find <span class="pl-c1">102</span>
 j.self_and_ancestor_ids
 =&gt; [<span class="pl-c1">102</span>, <span class="pl-c1">87</span>, <span class="pl-c1">77</span>]
 j.update <span class="pl-c1">parent_id:</span> <span class="pl-c1">96</span>
@@ -269,18 +249,18 @@ j.self_and_ancestor_ids
 <p><code>hash_tree</code> provides a method for rendering a subtree as an
 ordered nested hash:</p>
 
-<div class="highlight highlight-ruby"><pre>b <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>a b<span class="pl-pds">)</span></span>
+<div class="highlight highlight-ruby"><pre>b <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w(</span>a b<span class="pl-pds">)</span></span>
 a <span class="pl-k">=</span> b.parent
-b2 <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>a b2<span class="pl-pds">)</span></span>
-d1 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>c1 d1<span class="pl-pds">)</span></span>
+b2 <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w(</span>a b2<span class="pl-pds">)</span></span>
+d1 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w(</span>c1 d1<span class="pl-pds">)</span></span>
 c1 <span class="pl-k">=</span> d1.parent
-d2 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s1"><span class="pl-pds">%w(</span>c2 d2<span class="pl-pds">)</span></span>
+d2 <span class="pl-k">=</span> b.find_or_create_by_path <span class="pl-s"><span class="pl-pds">%w(</span>c2 d2<span class="pl-pds">)</span></span>
 c2 <span class="pl-k">=</span> d2.parent
 
-<span class="pl-s3">Tag</span>.hash_tree
+<span class="pl-c1">Tag</span>.hash_tree
 =&gt; {a =&gt; {b =&gt; {c1 =&gt; {d1 =&gt; {}}, c2 =&gt; {d2 =&gt; {}}}, b2 =&gt; {}}}
 
-<span class="pl-s3">Tag</span>.hash_tree(<span class="pl-c1">:limit_depth</span> =&gt; <span class="pl-c1">2</span>)
+<span class="pl-c1">Tag</span>.hash_tree(<span class="pl-c1">:limit_depth</span> =&gt; <span class="pl-c1">2</span>)
 =&gt; {a =&gt; {b =&gt; {}, b2 =&gt; {}}}
 
 b.hash_tree
@@ -303,7 +283,7 @@ server may not be happy trying to do this.</p>
 
 <p>For example, for the above tree, write out the DOT file with ruby:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="pl-s3">File</span>.open(<span class="pl-s1"><span class="pl-pds">"</span>example.dot<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>w<span class="pl-pds">"</span></span>) { |<span class="pl-vo">f</span>| f.write(<span class="pl-s3">Tag</span>.root.to_dot_digraph) }</pre></div>
+<div class="highlight highlight-ruby"><pre><span class="pl-c1">File</span>.open(<span class="pl-s"><span class="pl-pds">"</span>example.dot<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>w<span class="pl-pds">"</span></span>) { |<span class="pl-smi">f</span>| f.write(<span class="pl-c1">Tag</span>.root.to_dot_digraph) }</pre></div>
 
 <p>Then, in a shell, <code>dot -Tpng example.dot &gt; example.png</code>, which produces:</p>
 
@@ -462,15 +442,15 @@ server may not be happy trying to do this.</p>
 you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="pl-c"># BAD: ActiveRecord ignores the :type attribute:</span>
-root.children.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>child<span class="pl-pds">"</span></span>, <span class="pl-c1">type:</span> <span class="pl-s1"><span class="pl-pds">"</span>WhenTag<span class="pl-pds">"</span></span>)</pre></div>
+root.children.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>child<span class="pl-pds">"</span></span>, <span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">"</span>WhenTag<span class="pl-pds">"</span></span>)</pre></div>
 
 <p>Instead, use either <code>.add_child</code> or <code>children &lt;&lt;</code>:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="pl-c"># GOOD!</span>
-a <span class="pl-k">=</span> <span class="pl-s3">Tag</span>.create!(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>)
-b <span class="pl-k">=</span> <span class="pl-s3">WhenTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>)
+a <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.create!(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>)
+b <span class="pl-k">=</span> <span class="pl-c1">WhenTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>)
 a.children <span class="pl-k">&lt;&lt;</span> b
-c <span class="pl-k">=</span> <span class="pl-s3">WhatTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>)
+c <span class="pl-k">=</span> <span class="pl-c1">WhatTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>)
 b.add_child(c)</pre></div>
 
 <p>See <a href="https://github.com/mceachen/closure_tree/issues/43">issue 43</a> for more information.</p>
@@ -483,7 +463,7 @@ b.add_child(c)</pre></div>
 <p>If you want to order children alphabetically, and your model has a <code>name</code> column, you'd do this:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Tag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
-  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>
+  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>
 <span class="pl-k">end</span></pre></div>
 
 <p>If you want a specific order, add a new integer column to your model in a migration:</p>
@@ -493,7 +473,7 @@ b.add_child(c)</pre></div>
 <p>and in your model:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">OrderedTag<span class="pl-e"> &lt; ActiveRecord::Base</span></span>
-  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s1"><span class="pl-pds">'</span>sort_order<span class="pl-pds">'</span></span>
+  has_closure_tree <span class="pl-c1">order:</span> <span class="pl-s"><span class="pl-pds">'</span>sort_order<span class="pl-pds">'</span></span>
 <span class="pl-k">end</span></pre></div>
 
 <p>When you enable <code>order</code>, you'll also have the following new methods injected into your model:</p>
@@ -558,28 +538,28 @@ Note that all of <code>node1</code>'s children's sort_orders will be incremented
 </ul>
 
 <div class="highlight highlight-ruby"><pre>
-root <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>)
-a <span class="pl-k">=</span> root.append_child(<span class="pl-s3">Label</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>))
-b <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>)
-c <span class="pl-k">=</span> <span class="pl-s3">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s1"><span class="pl-pds">'</span>c<span class="pl-pds">'</span></span>)
+root <span class="pl-k">=</span> <span class="pl-c1">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>)
+a <span class="pl-k">=</span> root.append_child(<span class="pl-c1">Label</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>))
+b <span class="pl-k">=</span> <span class="pl-c1">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>b<span class="pl-pds">'</span></span>)
+c <span class="pl-k">=</span> <span class="pl-c1">OrderedTag</span>.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">'</span>c<span class="pl-pds">'</span></span>)
 
 <span class="pl-c"># We have to call 'root.reload.children' because root won't be in sync with the database otherwise:</span>
 
 a.append_sibling(b)
 root.reload.children.pluck(<span class="pl-c1">:name</span>)
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>]
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>]
 
 a.prepend_sibling(b)
 root.reload.children.pluck(<span class="pl-c1">:name</span>)
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]
 
 a.append_sibling(c)
 root.reload.children.pluck(<span class="pl-c1">:name</span>)
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>]
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>]
 
 b.append_sibling(c)
 root.reload.children.pluck(<span class="pl-c1">:name</span>)
-=&gt; [<span class="pl-s1"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]</pre></div>
+=&gt; [<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>]</pre></div>
 
 <h2>
 <a id="concurrency" class="anchor" href="#concurrency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Concurrency</h2>
@@ -630,10 +610,10 @@ breaking-API changes to support it. I'm open to suggestions and pull requests.</
 fixture data, so you need to call <code>.rebuild!</code> before your test runs. There's an example in
 the spec <code>tag_spec.rb</code>:</p>
 
-<div class="highlight highlight-ruby"><pre>  describe <span class="pl-s1"><span class="pl-pds">"</span>Tag with fixtures<span class="pl-pds">"</span></span> <span class="pl-k">do</span>
+<div class="highlight highlight-ruby"><pre>  describe <span class="pl-s"><span class="pl-pds">"</span>Tag with fixtures<span class="pl-pds">"</span></span> <span class="pl-k">do</span>
     fixtures <span class="pl-c1">:tags</span>
     before <span class="pl-c1">:each</span> <span class="pl-k">do</span>
-      <span class="pl-s3">Tag</span>.rebuild! <span class="pl-c"># &lt;- required if you use fixtures</span>
+      <span class="pl-c1">Tag</span>.rebuild! <span class="pl-c"># &lt;- required if you use fixtures</span>
     <span class="pl-k">end</span></pre></div>
 
 <p>`
@@ -651,11 +631,11 @@ if the <code>FLOCK_DIR</code> is set consistently for all ruby processes.</p>
 <p>In your <code>spec_helper.rb</code> or <code>minitest_helper.rb</code>, add a <code>before</code> and <code>after</code> block:</p>
 
 <div class="highlight highlight-ruby"><pre>before <span class="pl-k">do</span>
-  <span class="pl-vo">ENV</span>[<span class="pl-s1"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s3">Dir</span>.mktmpdir
+  <span class="pl-c1">ENV</span>[<span class="pl-s"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">Dir</span>.mktmpdir
 <span class="pl-k">end</span>
 
 after <span class="pl-k">do</span>
-  <span class="pl-s3">FileUtils</span>.remove_entry_secure <span class="pl-vo">ENV</span>[<span class="pl-s1"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>]
+  <span class="pl-c1">FileUtils</span>.remove_entry_secure <span class="pl-c1">ENV</span>[<span class="pl-s"><span class="pl-pds">'</span>FLOCK_DIR<span class="pl-pds">'</span></span>]
 <span class="pl-k">end</span></pre></div>
 
 <h2>
@@ -663,24 +643,24 @@ after <span class="pl-k">do</span>
 
 <p>Closure tree comes with some RSpec2/3 matchers which you may use for your tests:</p>
 
-<div class="highlight highlight-ruby"><pre><span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>spec_helper<span class="pl-pds">'</span></span>
-<span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>closure_tree/test/matcher<span class="pl-pds">'</span></span>
+<div class="highlight highlight-ruby"><pre><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>spec_helper<span class="pl-pds">'</span></span>
+<span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>closure_tree/test/matcher<span class="pl-pds">'</span></span>
 
-describe <span class="pl-vo">Category</span> <span class="pl-k">do</span>
+describe <span class="pl-c1">Category</span> <span class="pl-k">do</span>
  <span class="pl-c"># Should syntax</span>
  it { should be_a_closure_tree }
  <span class="pl-c"># Expect syntax</span>
  it { is_expected.to be_a_closure_tree }
 <span class="pl-k">end</span>
 
-describe <span class="pl-vo">Label</span> <span class="pl-k">do</span>
+describe <span class="pl-c1">Label</span> <span class="pl-k">do</span>
  <span class="pl-c"># Should syntax</span>
  it { should be_a_closure_tree.ordered }
  <span class="pl-c"># Expect syntax</span>
  it { is_expected.to be_a_closure_tree.ordered }
 <span class="pl-k">end</span>
 
-describe <span class="pl-s3">TodoList</span>::<span class="pl-vo">Item</span> <span class="pl-k">do</span>
+describe <span class="pl-c1">TodoList</span>::<span class="pl-c1">Item</span> <span class="pl-k">do</span>
  <span class="pl-c"># Should syntax</span>
  it { should be_a_closure_tree.ordered(<span class="pl-c1">:priority_order</span>) }
  <span class="pl-c"># Expect syntax</span>
@@ -697,7 +677,7 @@ describe <span class="pl-s3">TodoList</span>::<span class="pl-vo">Item</span> <s
 <li>Ruby 1.9.3, 2.1.2 (and sometimes head)</li>
 <li>Rubinius 2.2.1+ (and sometimes head)</li>
 <li>jRuby 1.9mode (and sometimes head)</li>
-<li>The latest Rails 3.2, 4.0, 4.1 and master branches</li>
+<li>The latest Rails 3.2, 4.0, 4.1, 4.2 and master branches</li>
 <li>Concurrency tests for MySQL and PostgreSQL. SQLite is tested in a single-threaded environment.</li>
 </ul>
 
@@ -720,14 +700,16 @@ run the test matrix locally.</p>
 <li>JetBrains, which provides an <a href="http://www.jetbrains.com/ruby/buy/buy.jsp#openSource">open-source license</a> to
 <a href="http://www.jetbrains.com/ruby/features/">RubyMine</a> for the development of this project.</li>
 </ul>
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/mceachen">mceachen</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/mceachen/closure_tree">Closure tree</a> is maintained by <a href="https://github.com/mceachen">mceachen</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
