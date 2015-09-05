@@ -83,8 +83,8 @@ closure_tree has some great features:</p>
 </li>
 <li>
 <strong>Support for <a href="#concurrency">concurrency</a></strong> (using <a href="https://github.com/mceachen/with_advisory_lock">with_advisory_lock</a>)</li>
-<li><strong>Support for Rails 3.2, 4.0, and 4.1</strong></li>
-<li><strong>Support for Ruby 1.9, 2.1, and jRuby 1.6.13</strong></li>
+<li><strong>Support for ActiveRecord 4.1, 4.2 and 5.0.alpha</strong></li>
+<li><strong>Support for Ruby 2.2 and JRuby 9000</strong></li>
 <li>Support for reparenting children (and all their descendants)</li>
 <li>Support for <a href="#sti">single-table inheritance (STI)</a> within the hierarchy</li>
 <li>
@@ -121,7 +121,7 @@ for a description of different tree storage algorithms.</p>
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Note that closure_tree only supports Rails 3.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
+<p>Note that closure_tree only supports ActiveRecord 4.1 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.</p>
 
 <ol>
 <li><p>Add <code>gem 'closure_tree'</code> to your Gemfile </p></li>
@@ -147,7 +147,7 @@ to the <a href="#warning">warning section</a>!</p>
 </li>
 <li>
 <p>Add a migration to add a <code>parent_id</code> column to the hierarchical model.
-You may want to also <a href="#sort_order">add a column for deterministic ordering of children</a>, but that's optional.</p>
+You may want to also <a href="#deterministic-ordering">add a column for deterministic ordering of children</a>, but that's optional.</p>
 
 <div class="highlight highlight-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">AddParentIdToTag<span class="pl-e"> &lt; ActiveRecord::Migration</span></span>
   <span class="pl-k">def</span> <span class="pl-en">change</span>
@@ -458,23 +458,6 @@ server may not be happy trying to do this.</p>
 <span class="pl-k">class</span> <span class="pl-en">WhereTag<span class="pl-e"> &lt; Tag</span></span> ; <span class="pl-k">end</span>
 <span class="pl-k">class</span> <span class="pl-en">WhatTag<span class="pl-e"> &lt; Tag</span></span> ; <span class="pl-k">end</span></pre></div>
 
-<p>Please note that Rails (&lt;= 3.2) doesn't handle polymorphic associations correctly if
-you use the <code>:type</code> attribute, so <strong>this doesn't work</strong>:</p>
-
-<div class="highlight highlight-ruby"><pre><span class="pl-c"># BAD: ActiveRecord ignores the :type attribute:</span>
-root.children.create(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>child<span class="pl-pds">"</span></span>, <span class="pl-c1">type:</span> <span class="pl-s"><span class="pl-pds">"</span>WhenTag<span class="pl-pds">"</span></span>)</pre></div>
-
-<p>Instead, use either <code>.add_child</code> or <code>children &lt;&lt;</code>:</p>
-
-<div class="highlight highlight-ruby"><pre><span class="pl-c"># GOOD!</span>
-a <span class="pl-k">=</span> <span class="pl-c1">Tag</span>.create!(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>)
-b <span class="pl-k">=</span> <span class="pl-c1">WhenTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>)
-a.children <span class="pl-k">&lt;&lt;</span> b
-c <span class="pl-k">=</span> <span class="pl-c1">WhatTag</span>.<span class="pl-k">new</span>(<span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>)
-b.add_child(c)</pre></div>
-
-<p>See <a href="https://github.com/mceachen/closure_tree/issues/43">issue 43</a> for more information.</p>
-
 <h2>
 <a id="deterministic-ordering" class="anchor" href="#deterministic-ordering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deterministic ordering</h2>
 
@@ -694,10 +677,9 @@ describe <span class="pl-c1">TodoList</span>::<span class="pl-c1">Item</span> <s
 <p>Closure tree is <a href="http://travis-ci.org/#!/mceachen/closure_tree">tested under every valid combination</a> of</p>
 
 <ul>
-<li>Ruby 1.9.3, 2.1.2 (and sometimes head)</li>
-<li>Rubinius 2.2.1+ (and sometimes head)</li>
-<li>jRuby 1.9mode (and sometimes head)</li>
-<li>The latest Rails 3.2, 4.0, 4.1, 4.2 and master branches</li>
+<li>Ruby 2.2 (and sometimes head)</li>
+<li>jRuby 9000 (and sometimes head)</li>
+<li>The latest ActiveRecord 4.1, 4.2, and master branch</li>
 <li>Concurrency tests for MySQL and PostgreSQL. SQLite is tested in a single-threaded environment.</li>
 </ul>
 
