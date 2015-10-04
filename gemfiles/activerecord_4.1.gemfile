@@ -2,8 +2,8 @@
 
 source "https://rubygems.org"
 
-gem "foreigner", :git => "https://github.com/matthuhiggins/foreigner.git"
 gem "activerecord", "~> 4.1.0"
+gem "foreigner", :github => "matthuhiggins/foreigner"
 
 platforms :ruby do
   gem "mysql2"
