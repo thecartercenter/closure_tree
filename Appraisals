@@ -8,6 +8,6 @@ appraise 'activerecord-4.2' do
 end
 
 appraise 'activerecord-edge' do
-  gem 'activerecord', github: 'rails/rails'
   gem 'arel', github: 'rails/arel'
+  gem 'activerecord', github: 'rails/rails'
 end

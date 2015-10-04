@@ -6,7 +6,7 @@ gem "activerecord", "~> 4.1.0"
 gem "foreigner", :github => "matthuhiggins/foreigner"
 
 platforms :ruby do
-  gem "mysql2"
+  gem "mysql2", "~> 0.3.0"
   gem "pg"
   gem "sqlite3"
 end

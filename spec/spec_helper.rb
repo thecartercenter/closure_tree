@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
 
+# TODO: are the next 2 lines actually necessary?
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
 require 'rspec'
