@@ -5,7 +5,7 @@ source "https://rubygems.org"
 gem "foreigner", :git => "https://github.com/matthuhiggins/foreigner.git"
 gem "activerecord", "~> 4.1.0"
 
-platforms :ruby, :rbx do
+platforms :ruby do
   gem "mysql2"
   gem "pg"
   gem "sqlite3"
