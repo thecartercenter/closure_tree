@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-platforms :ruby do
-  gem 'mysql2', '~> 0.3.0'
+platforms :ruby, :rbx do
   gem 'pg'
   gem 'sqlite3'
 end
