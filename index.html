@@ -605,7 +605,13 @@ database with multiple threads, and don't provide an alternative mutex.</p>
 <h3>
 <a id="does-this-work-well-with-default_scope" class="anchor" href="#does-this-work-well-with-default_scope" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Does this work well with <code>#default_scope</code>?</h3>
 
-<p>No. Please see <a href="https://github.com/mceachen/closure_tree/issues/86">issue 86</a> for details.</p>
+<p><strong>No.</strong> Please see <a href="https://github.com/mceachen/closure_tree/issues/86">issue 86</a> for details.</p>
+
+<h3>
+<a id="can-i-update-parentage-with-update_attribute" class="anchor" href="#can-i-update-parentage-with-update_attribute" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Can I update parentage with <code>update_attribute</code>?</h3>
+
+<p><strong>No.</strong> <code>update_attribute</code> skips the validation hook that is required for maintaining the 
+hierarchy table.</p>
 
 <h3>
 <a id="does-this-gem-support-multiple-parents" class="anchor" href="#does-this-gem-support-multiple-parents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Does this gem support multiple parents?</h3>
