@@ -114,6 +114,21 @@ class LabelWithoutRootOrdering < ActiveRecord::Base
   end
 end
 
+class LabelWithOrderBase100 < ActiveRecord::Base
+  # make sure order doesn't matter
+  acts_as_tree :order => :column_whereby_ordering_is_inferred, # <- symbol, and not "sort_order"
+    :numeric_order => true,
+    :order_base => 100,
+    :parent_column_name => "mother_id",
+    :hierarchy_table_name => "label_hierarchies"
+
+  self.table_name = "#{table_name_prefix}labels#{table_name_suffix}"
+
+  def to_s
+    "#{self.class}: #{name}"
+  end
+end
+
 class CuisineType < ActiveRecord::Base
   acts_as_tree
 end

@@ -423,6 +423,9 @@ describe Label do
   end
 
   context "order_value must be set" do
+    let(:expected_order_base) { 0 }
+    let(:expected_root_order_value) { expected_order_base }
+
     shared_examples_for "correct order_value" do
       before do
         @root = model.create(name: 'root')
@@ -434,29 +437,34 @@ describe Label do
       end
 
       it 'should set order_value with siblings' do
-        expect(@a.order_value).to eq(0)
-        expect(@b.order_value).to eq(1)
-        expect(@c.order_value).to eq(2)
+        expect(@a.order_value).to eq(expected_order_base)
+        expect(@b.order_value).to eq(expected_order_base + 1)
+        expect(@c.order_value).to eq(expected_order_base + 2)
       end
 
       it 'should reset order_value when a node is moved to another location' do
         root2 = model.create(name: 'root2')
         root2.add_child @b
-        expect(@a.order_value).to eq(0)
-        expect(@b.order_value).to eq(0)
-        expect(@c.reload.order_value).to eq(1)
+        expect(@a.order_value).to eq(expected_order_base)
+        expect(@b.order_value).to eq(expected_order_base)
+        expect(@c.reload.order_value).to eq(expected_order_base + 1)
       end
     end
 
     context "with normal model" do
       let(:model) { Label }
-      let(:expected_root_order_value) { 0 }
       it_behaves_like "correct order_value"
     end
 
     context "without root ordering" do
       let(:model) { LabelWithoutRootOrdering }
       let(:expected_root_order_value) { nil }
+      it_behaves_like "correct order_value"
+    end
+
+    context "with order base 100" do
+      let(:model) { LabelWithOrderBase100 }
+      let(:expected_order_base) { 100 }
       it_behaves_like "correct order_value"
     end
   end

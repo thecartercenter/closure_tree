@@ -9,6 +9,7 @@ module ClosureTree
         :name_column,
         :order,
         :dont_order_roots,
+        :order_base,
         :numeric_order,
         :touch,
         :with_advisory_lock

@@ -20,7 +20,7 @@ module ClosureTree
         else
           ""
         end
-        connection.execute 'SET @i = 0'
+        connection.execute "SET @i = #{order_base}"
         connection.execute <<-SQL.strip_heredoc
           UPDATE #{quoted_table_name}
             SET #{quoted_order_column} = (@i := @i + 1) + #{minimum_sort_order_value.to_i - 1}
@@ -42,7 +42,7 @@ module ClosureTree
           UPDATE #{quoted_table_name}
           SET #{quoted_order_column(false)} = t.seq + #{minimum_sort_order_value.to_i - 1}
           FROM (
-            SELECT #{quoted_id_column_name} AS id, row_number() OVER(ORDER BY #{order_by}) AS seq
+            SELECT #{quoted_id_column_name} AS id, row_number() OVER(ORDER BY #{order_by}) + #{order_base} AS seq
             FROM #{quoted_table_name}
             WHERE #{where_eq(parent_column_name, parent_id)} #{min_where}
           ) AS t
@@ -66,7 +66,7 @@ module ClosureTree
           scope = scope.where("#{quoted_order_column} >= #{minimum_sort_order_value}")
         end
         scope.each_with_index do |ea, idx|
-          ea.update_order_value(idx + minimum_sort_order_value.to_i)
+          ea.update_order_value(order_base + idx + minimum_sort_order_value.to_i)
         end
       end
     end

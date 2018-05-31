@@ -489,6 +489,17 @@ root.reload.children.pluck(:name)
 => ["b", "c", "a"]
 ```
 
+### Numeric Order Base
+
+With numeric ordering, the default base is 0, meaning the first sibling will be numbered 0, the next 1,
+and so on. If you need a different base, you can specify e.g. `order_base: 1` as an option to your declaration:
+
+```
+has_closure_tree order: 'sort_order', numeric_order: true, order_base: 1
+```
+
+This option will be ignored unless `numeric_order` is set to true.
+
 ### Ordering Roots
 
 With numeric ordering, root nodes are, by default, assigned order values globally across the whole database table. So for instance if you have 5 nodes with no parent, they will be ordered 0 through 4 by default. If your model represents many separate trees and you have a lot of records, this can cause performance problems, and doesn't really make much sense.
@@ -502,7 +513,6 @@ has_closure_tree order: 'sort_order', numeric_order: true, dont_order_roots: tru
 In this case, calling `prepend_sibling` and `append_sibling` on a root node or calling `roots_and_descendants_preordered` on the model will raise a `RootOrderingDisabledError`.
 
 The `dont_order_roots` option will be ignored unless `numeric_order` is set to true.
-
 
 ## Concurrency
 

@@ -75,6 +75,10 @@ module ClosureTree
       options[:order]
     end
 
+    def order_base
+      options[:order_base] || 0
+    end
+
     def dont_order_roots
       options[:dont_order_roots] || false
     end
