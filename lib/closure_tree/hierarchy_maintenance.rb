@@ -38,10 +38,10 @@ module ClosureTree
       as_5_1 = ActiveSupport.version >= Gem::Version.new('5.1.0')
       changes_method = as_5_1 ? :saved_changes : :changes
 
-      if public_send(changes_method)[_ct.parent_column_name] || @was_new_record
+      if public_send(changes_method)[_ct.parent_column_name] || was_new_record?
         rebuild!
       end
-      if public_send(changes_method)[_ct.parent_column_name] && !@was_new_record
+      if public_send(changes_method)[_ct.parent_column_name] && !was_new_record?
         # Resetting the ancestral collections addresses
         # https://github.com/mceachen/closure_tree/issues/68
         ancestor_hierarchies.reload
@@ -64,7 +64,7 @@ module ClosureTree
 
     def rebuild!(called_by_rebuild = false)
       _ct.with_advisory_lock do
-        delete_hierarchy_references unless (defined? @was_new_record) && @was_new_record
+        delete_hierarchy_references unless was_new_record?
         hierarchy_class.create!(:ancestor => self, :descendant => self, :generations => 0)
         unless root?
           _ct.connection.execute <<-SQL.squish
@@ -84,7 +84,9 @@ module ClosureTree
 
         children.find_each { |c| c.rebuild!(true) }
 
-        _ct_reorder_children if _ct.order_is_numeric? && children.present?
+        if !was_new_record? && !@_ct_skip_sort_order_maintenance && _ct.order_is_numeric? && children.present?
+          _ct_reorder_children
+        end
       end
     end
 
@@ -105,6 +107,10 @@ module ClosureTree
             ) #{ _ct.t_alias_keyword } x )
         SQL
       end
+    end
+
+    def was_new_record?
+      (defined? @was_new_record) && @was_new_record
     end
 
     module ClassMethods
