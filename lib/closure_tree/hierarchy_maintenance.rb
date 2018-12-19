@@ -15,6 +15,13 @@ module ClosureTree
       @_ct_skip_cycle_detection = true
     end
 
+    # Set flag and propagate to all children.
+    def _ct_fast_insert!(root: true)
+      @_ct_fast_insert = true
+      @_ct_fast_insert_root = true if root
+      children.each { |c| c._ct_fast_insert!(root: false) }
+    end
+
     def _ct_skip_sort_order_maintenance!
       @_ct_skip_sort_order_maintenance = true
     end
@@ -35,6 +42,15 @@ module ClosureTree
     end
 
     def _ct_after_save
+      # If doing a fast insert, we don't run the rest of this method because rebuild! is slow.
+      # Additionally, if this is the root of the insert, we initiate a top-down
+      # hierarchy node insertion process.
+      if @_ct_fast_insert
+        return unless @_ct_fast_insert_root
+        _ct_fast_insert_hierarchy_nodes
+        return
+      end
+
       as_5_1 = ActiveSupport.version >= Gem::Version.new('5.1.0')
       changes_method = as_5_1 ? :saved_changes : :changes
 
@@ -60,6 +76,21 @@ module ClosureTree
         end
       end
       true # don't prevent destruction
+    end
+
+    # Inserts appropriate hierarchy nodes, starting with root.
+    def _ct_fast_insert_hierarchy_nodes
+      hierarchy_class.create!(:ancestor => self, :descendant => self, :generations => 0)
+      unless root?
+        _ct.connection.execute <<-SQL.strip_heredoc
+          INSERT INTO #{_ct.quoted_hierarchy_table_name}
+            (ancestor_id, descendant_id, generations)
+          SELECT x.ancestor_id, #{_ct.quote(_ct_id)}, x.generations + 1
+          FROM #{_ct.quoted_hierarchy_table_name} x
+          WHERE x.descendant_id = #{_ct.quote(_ct_parent_id)}
+        SQL
+      end
+      children.each { |c| c._ct_fast_insert_hierarchy_nodes }
     end
 
     def rebuild!(called_by_rebuild = false)
