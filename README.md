@@ -5,8 +5,7 @@
 Common applications include modeling hierarchical data, like tags, threaded comments, page graphs in CMSes,
 and tracking user referrals.
 
-[![Join the chat at https://gitter.im/closure_tree/Lobby](https://badges.gitter.im/closure_tree/Lobby.svg)](https://gitter.im/closure_tree/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://api.travis-ci.org/ClosureTree/closure_tree.svg?branch=master)](http://travis-ci.org/ClosureTree/closure_tree)
+[![CI](https://github.com/ClosureTree/closure_tree/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ClosureTree/closure_tree/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/closure_tree.svg)](https://badge.fury.io/rb/closure_tree)
 
 Dramatically more performant than
@@ -25,7 +24,7 @@ closure_tree has some great features:
   * 2 SQL INSERTs on node creation
   * 3 SQL INSERT/UPDATEs on node reparenting
 * __Support for [concurrency](#concurrency)__ (using [with_advisory_lock](https://github.com/ClosureTree/with_advisory_lock))
-* __Tested against ActiveRecord 4.2, 5.0, 5.1, 5.2 and 6.0 with  Ruby 2.5 and 2.6__
+* __Tested against ActiveRecord 6.0+ with Ruby 2.7+__
 * Support for reparenting children (and all their descendants)
 * Support for [single-table inheritance (STI)](#sti) within the hierarchy
 * ```find_or_create_by_path``` for [building out heterogeneous hierarchies quickly and conveniently](#find_or_create_by_path)
@@ -53,7 +52,7 @@ for a description of different tree storage algorithms.
 
 ## Installation
 
-Note that closure_tree only supports ActiveRecord 4.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.
+Note that closure_tree only supports ActiveRecord 6.0 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.
 
 1.  Add `gem 'closure_tree'` to your Gemfile
 
@@ -337,7 +336,8 @@ When you include ```has_closure_tree``` in your model, you can provide a hash to
 * ```Tag.find_by_path(path, attributes)``` returns the node whose name path is ```path```. See (#find_or_create_by_path).
 * ```Tag.find_or_create_by_path(path, attributes)``` returns the node whose name path is ```path```, and will create the node if it doesn't exist already.See (#find_or_create_by_path).
 * ```Tag.find_all_by_generation(generation_level)``` returns the descendant nodes who are ```generation_level``` away from a root. ```Tag.find_all_by_generation(0)``` is equivalent to ```Tag.roots```.
-* ```Tag.with_ancestor(ancestors)``` scopes to all descendants whose ancestor is in the given list.
+* ```Tag.with_ancestor(ancestors)``` scopes to all descendants whose ancestors(s) is/are in the given list.
+* ```Tag.with_descendant(ancestors)``` scopes to all ancestors whose descendant(s) is/are in the given list.
 * ```Tag.lowest_common_ancestor(descendants)``` finds the lowest common ancestor of the descendants.
 ### Instance methods
 
@@ -660,14 +660,27 @@ end
 
 ## Testing
 
-Closure tree is [tested under every valid combination](http://travis-ci.org/#!/ClosureTree/closure_tree) of
+Closure tree is [tested under every valid combination](https://github.com/ClosureTree/closure_tree/blob/master/.github/workflows/ci.yml) of
 
-* Ruby 2.5, 2.6 and 2.7
-* ActiveRecord 4.2, 5.x and 6.0
+* Ruby 2.7+
+* ActiveRecord 6.0+
 * PostgreSQL, MySQL, and SQLite. Concurrency tests are only run with MySQL and PostgreSQL.
 
-Assuming you're using [rbenv](https://github.com/sstephenson/rbenv), you can use ```tests.sh``` to
-run the test matrix locally.
+```shell
+$ bundle
+$ appraisal bundle # this will install the matrix of dependencies
+$ appraisal rake # this will run the tests in all combinations
+$ appraisal activerecord-7.0 rake # this will run the tests in AR 7.0 only
+$ appraisal activerecord-7.0 rake spec # this will run rspec in AR 7.0 only
+$ appraisal activerecord-7.0 rake test # this will run minitest in AR 7.0 only
+```
+
+By default the test are run with sqlite3 only. 
+You run test with other databases by passing the database url as environment variable:
+
+```shell
+$ DATABASE_URL=postgres://localhost/my_database appraisal activerecord-7.0 rake test 
+```
 
 ## Change log
 

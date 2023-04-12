@@ -1,5 +1,5 @@
 ---
-name: CI
+name: CI Truffleruby
 
 on:
   push:
@@ -37,10 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          - '3.2'
-          - '3.1'
-          - '3.0'
-          - '2.7'
+          - truffleruby
         rails:
           - activerecord_7.0
           - activerecord_6.1
@@ -57,7 +54,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
+          ruby-version: truffleruby
           bundler-cache: true
           rubygems: latest
         env:
