@@ -24,7 +24,7 @@ closure_tree has some great features:
   * 2 SQL INSERTs on node creation
   * 3 SQL INSERT/UPDATEs on node reparenting
 * __Support for [concurrency](#concurrency)__ (using [with_advisory_lock](https://github.com/ClosureTree/with_advisory_lock))
-* __Tested against ActiveRecord 6.0+ with Ruby 2.7+__
+* __Tested against ActiveRecord 7.2+ with Ruby 3.3+__
 * Support for reparenting children (and all their descendants)
 * Support for [single-table inheritance (STI)](#sti) within the hierarchy
 * ```find_or_create_by_path``` for [building out heterogeneous hierarchies quickly and conveniently](#find_or_create_by_path)
@@ -46,13 +46,14 @@ for a description of different tree storage algorithms.
 - [Polymorphic hierarchies with STI](#polymorphic-hierarchies-with-sti)
 - [Deterministic ordering](#deterministic-ordering)
 - [Concurrency](#concurrency)
+- [Multi-Database Support](#multi-database-support)
 - [FAQ](#faq)
 - [Testing](#testing)
 - [Change log](#change-log)
 
 ## Installation
 
-Note that closure_tree only supports ActiveRecord 6.0 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.
+Note that closure_tree only supports ActiveRecord 7.2 and later, and has test coverage for MySQL, PostgreSQL, and SQLite.
 
 1.  Add `gem 'closure_tree'` to your Gemfile
 
@@ -61,16 +62,18 @@ Note that closure_tree only supports ActiveRecord 6.0 and later, and has test co
 3.  Add `has_closure_tree` (or `acts_as_tree`, which is an alias of the same method) to your hierarchical model:
 
     ```ruby
-    class Tag < ActiveRecord::Base
+    class Tag < ApplicationRecord
       has_closure_tree
     end
 
-    class AnotherTag < ActiveRecord::Base
+    class AnotherTag < ApplicationRecord
       acts_as_tree
     end
     ```
 
     Make sure you check out the [large number of options](#available-options) that `has_closure_tree` accepts.
+
+    **Note:** The `acts_as_tree` alias is only created if your model doesn't already have a method with that name. This prevents conflicts with other gems like the original `acts_as_tree` gem.
 
     **IMPORTANT: Make sure you add `has_closure_tree` _after_ `attr_accessible` and
     `self.table_name =` lines in your model.**
@@ -82,7 +85,7 @@ Note that closure_tree only supports ActiveRecord 6.0 and later, and has test co
     You may want to also [add a column for deterministic ordering of children](#deterministic-ordering), but that's optional.
 
     ```ruby
-    class AddParentIdToTag < ActiveRecord::Migration
+    class AddParentIdToTag < ActiveRecord::Migration[7.2]
       def change
         add_column :tags, :parent_id, :integer
       end
@@ -155,10 +158,10 @@ Then:
 
 ```ruby
 grandparent.self_and_descendants.collect(&:name)
-=> ["Grandparent", "Parent", "First Child", "Second Child", "Third Child", "Fourth Child"]
+#=> ["Grandparent", "Parent", "First Child", "Second Child", "Third Child", "Fourth Child"]
 
 child1.ancestry_path
-=> ["Grandparent", "Parent", "First Child"]
+#=> ["Grandparent", "Parent", "First Child"]
 ```
 
 ### find_or_create_by_path
@@ -203,19 +206,16 @@ d = Tag.find_or_create_by_path %w[a b c d]
 h = Tag.find_or_create_by_path %w[e f g h]
 e = h.root
 d.add_child(e) # "d.children << e" would work too, of course
-h.ancestry_path
-=> ["a", "b", "c", "d", "e", "f", "g", "h"]
+h.ancestry_path #=> ["a", "b", "c", "d", "e", "f", "g", "h"]
 ```
 
 When it is more convenient to simply change the `parent_id` of a node directly (for example, when dealing with a form `<select>`), closure_tree will handle the necessary changes automatically when the record is saved:
 
 ```ruby
 j = Tag.find 102
-j.self_and_ancestor_ids
-=> [102, 87, 77]
+j.self_and_ancestor_ids #=> [102, 87, 77]
 j.update parent_id: 96
-j.self_and_ancestor_ids
-=> [102, 96, 95, 78]
+j.self_and_ancestor_ids #=> [102, 96, 95, 78]
 ```
 
 ### Nested hashes
@@ -232,17 +232,13 @@ c1 = d1.parent
 d2 = b.find_or_create_by_path %w(c2 d2)
 c2 = d2.parent
 
-Tag.hash_tree
-=> {a => {b => {c1 => {d1 => {}}, c2 => {d2 => {}}}, b2 => {}}}
+Tag.hash_tree #=> {a => {b => {c1 => {d1 => {}}, c2 => {d2 => {}}}, b2 => {}}}
 
-Tag.hash_tree(:limit_depth => 2)
-=> {a => {b => {}, b2 => {}}}
+Tag.hash_tree(:limit_depth => 2) #=> {a => {b => {}, b2 => {}}}
 
-b.hash_tree
-=> {b => {c1 => {d1 => {}}, c2 => {d2 => {}}}}
+b.hash_tree #=> {b => {c1 => {d1 => {}}, c2 => {d2 => {}}}}
 
-b.hash_tree(:limit_depth => 2)
-=> {b => {c1 => {}, c2 => {}}}
+b.hash_tree(:limit_depth => 2) #=> {b => {c1 => {}, c2 => {}}}
 ```
 
 **If your tree is large (or might become so), use :limit_depth.**
@@ -347,7 +343,7 @@ When you include ```has_closure_tree``` in your model, you can provide a hash to
 * ```tag.child?``` returns true if this is a child node. It has a parent.
 * ```tag.leaf?``` returns true if this is a leaf node. It has no children.
 * ```tag.leaves``` is scoped to all leaf nodes in self_and_descendants.
-* ```tag.depth``` returns the depth, or "generation", for this node in the tree. A root node will have a value of 0.
+* ```tag.depth``` returns the depth, or "generation", for this node in the tree. A root node will have a value of 0. Also aliased as `level`.
 * ```tag.parent``` returns the node's immediate parent. Root nodes will return nil.
 * ```tag.parent_of?(node)``` returns true if current node is parent of another one
 * ```tag.children``` is a ```has_many``` of immediate children (just those nodes whose parent is the current node).
@@ -384,7 +380,7 @@ Polymorphic models using single table inheritance (STI) are supported:
 2. Subclass the model class. You only need to add ```has_closure_tree``` to your base class:
 
 ```ruby
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   has_closure_tree
 end
 class WhenTag < Tag ; end
@@ -411,7 +407,7 @@ By default, children will be ordered by your database engine, which may not be w
 If you want to order children alphabetically, and your model has a ```name``` column, you'd do this:
 
 ```ruby
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   has_closure_tree order: 'name'
 end
 ```
@@ -425,7 +421,7 @@ t.integer :sort_order
 and in your model:
 
 ```ruby
-class OrderedTag < ActiveRecord::Base
+class OrderedTag < ApplicationRecord
   has_closure_tree order: 'sort_order', numeric_order: true
 end
 ```
@@ -476,20 +472,16 @@ c = OrderedTag.create(name: 'c')
 # We have to call 'root.reload.children' because root won't be in sync with the database otherwise:
 
 a.append_sibling(b)
-root.reload.children.pluck(:name)
-=> ["a", "b"]
+root.reload.children.pluck(:name) #=> ["a", "b"]
 
 a.prepend_sibling(b)
-root.reload.children.pluck(:name)
-=> ["b", "a"]
+root.reload.children.pluck(:name) #=> ["b", "a"]
 
 a.append_sibling(c)
-root.reload.children.pluck(:name)
-=> ["b", "a", "c"]
+root.reload.children.pluck(:name) #=> ["b", "a", "c"]
 
 b.append_sibling(c)
-root.reload.children.pluck(:name)
-=> ["b", "c", "a"]
+root.reload.children.pluck(:name) #=> ["b", "c", "a"]
 ```
 
 ### Ordering Roots
@@ -525,13 +517,105 @@ If you are already managing concurrency elsewhere in your application, and want 
 of with_advisory_lock, pass ```with_advisory_lock: false``` in the options hash:
 
 ```ruby
-class Tag
+class Tag < ApplicationRecord
   has_closure_tree with_advisory_lock: false
 end
 ```
 
 Note that you *will eventually have data corruption* if you disable advisory locks, write to your
 database with multiple threads, and don't provide an alternative mutex.
+
+### Customizing Advisory Lock Names
+
+By default, closure_tree generates advisory lock names based on the model class name. You can customize
+this behavior in several ways:
+
+```ruby
+# Static string
+class Tag < ApplicationRecord
+  has_closure_tree advisory_lock_name: 'custom_tag_lock'
+end
+
+# Dynamic via Proc
+class Tag < ApplicationRecord
+  has_closure_tree advisory_lock_name: ->(model_class) { "#{Rails.env}_#{model_class.name.underscore}" }
+end
+
+# Delegate to model method
+class Tag < ApplicationRecord
+  has_closure_tree advisory_lock_name: :custom_lock_name
+  
+  def self.custom_lock_name
+    "tag_lock_#{current_tenant_id}"
+  end
+end
+```
+
+This is particularly useful when:
+* You need environment-specific lock names
+* You're using multi-tenancy and need tenant-specific locks
+* You want to avoid lock name collisions between similar model names
+
+## Multi-Database Support
+
+Closure Tree fully supports running with multiple databases simultaneously, including mixing different database engines (PostgreSQL, MySQL, SQLite) in the same application. This is particularly useful for:
+
+* Applications with read replicas
+* Sharding strategies
+* Testing with different database engines
+* Gradual database migrations
+
+### Database-Specific Behaviors
+
+#### PostgreSQL
+* Full support for advisory locks via `with_advisory_lock`
+* Excellent concurrency support with row-level locking
+* Best overall performance for tree operations
+
+#### MySQL
+* Advisory locks supported via `with_advisory_lock`
+* Note: MySQL's row-level locking may incorrectly report deadlocks in some cases
+* Requires MySQL 5.7.12+ to avoid hierarchy maintenance errors
+
+#### SQLite
+* **No advisory lock support** - always returns false from `with_advisory_lock`
+* Falls back to file-based locking for tests
+* Suitable for development and testing, but not recommended for production with concurrent writes
+
+### Configuration
+
+When using multiple databases, closure_tree automatically detects the correct adapter for each connection:
+
+```ruby
+class Tag < ApplicationRecord
+  connects_to database: { writing: :primary, reading: :replica }
+  has_closure_tree
+end
+
+class Category < ApplicationRecord  
+  connects_to database: { writing: :sqlite_db }
+  has_closure_tree
+end
+```
+
+Each model will use the appropriate database-specific SQL syntax and features based on its connection adapter.
+
+### Testing with Multiple Databases
+
+You can run the test suite against different databases:
+
+```bash
+# Run with PostgreSQL
+DATABASE_URL=postgres://localhost/closure_tree_test rake test
+
+# Run with MySQL  
+DATABASE_URL=mysql2://localhost/closure_tree_test rake test
+
+# Run with SQLite (default)
+rake test
+```
+
+For simultaneous multi-database testing, the test suite automatically sets up connections to all three database types when available.
 
 ## I18n
 
@@ -629,57 +713,37 @@ Upgrade to MySQL 5.7.12 or later if you see [this issue](https://github.com/Clos
 
 ## Testing with Closure Tree
 
-Closure tree comes with some RSpec2/3 matchers which you may use for your tests:
+Closure tree comes with test matchers which you may use in your tests:
 
 ```ruby
-require 'spec_helper'
+require 'test_helper'
 require 'closure_tree/test/matcher'
 
-describe Category do
- # Should syntax
- it { should be_a_closure_tree }
- # Expect syntax
- it { is_expected.to be_a_closure_tree }
+class CategoryTest < ActiveSupport::TestCase
+  test "should be a closure tree" do
+    assert Category.new.is_a?(ClosureTree::Model)
+  end
 end
-
-describe Label do
- # Should syntax
- it { should be_a_closure_tree.ordered }
- # Expect syntax
- it { is_expected.to be_a_closure_tree.ordered }
-end
-
-describe TodoList::Item do
- # Should syntax
- it { should be_a_closure_tree.ordered(:priority_order) }
- # Expect syntax
- it { is_expected.to be_a_closure_tree.ordered(:priority_order) }
-end
-
 ```
 
 ## Testing
 
 Closure tree is [tested under every valid combination](https://github.com/ClosureTree/closure_tree/blob/master/.github/workflows/ci.yml) of
 
-* Ruby 2.7+
-* ActiveRecord 6.0+
+* Ruby 3.3+
+* ActiveRecord 7.2+
 * PostgreSQL, MySQL, and SQLite. Concurrency tests are only run with MySQL and PostgreSQL.
 
 ```shell
 $ bundle
-$ appraisal bundle # this will install the matrix of dependencies
-$ appraisal rake # this will run the tests in all combinations
-$ appraisal activerecord-7.0 rake # this will run the tests in AR 7.0 only
-$ appraisal activerecord-7.0 rake spec # this will run rspec in AR 7.0 only
-$ appraisal activerecord-7.0 rake test # this will run minitest in AR 7.0 only
+$ rake test # this will run the tests
 ```
 
 By default the test are run with sqlite3 only. 
 You run test with other databases by passing the database url as environment variable:
 
 ```shell
-$ DATABASE_URL=postgres://localhost/my_database appraisal activerecord-7.0 rake test 
+$ DATABASE_URL=postgres://localhost/my_database rake test 
 ```
 
 ## Change log

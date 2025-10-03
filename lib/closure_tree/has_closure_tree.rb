@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClosureTree
   module HasClosureTree
     def has_closure_tree(options = {})
@@ -11,7 +13,8 @@ module ClosureTree
         :dont_order_roots,
         :numeric_order,
         :touch,
-        :with_advisory_lock
+        :with_advisory_lock,
+        :advisory_lock_name
       )
 
       class_attribute :_ct
@@ -22,7 +25,8 @@ module ClosureTree
       class_attribute :hierarchy_class
       self.hierarchy_class = _ct.hierarchy_class_for_model
 
-      # tests fail if you include Model before HierarchyMaintenance wtf
+      # Include modules - HierarchyMaintenance provides callbacks that Model associations depend on
+      # The order is maintained for consistency, but associations are now set up after all includes
       include ClosureTree::HierarchyMaintenance
       include ClosureTree::Model
       include ClosureTree::Finders
@@ -32,11 +36,13 @@ module ClosureTree
       include ClosureTree::DeterministicOrdering if _ct.order_option?
       include ClosureTree::NumericDeterministicOrdering if _ct.order_is_numeric?
 
+      # Include AssociationSetup last to ensure all dependencies are ready
+      include ClosureTree::AssociationSetup
+
       connection_pool.release_connection
-    rescue StandardError => e
-      raise e unless ClosureTree.configuration.database_less
     end
 
-    alias_method :acts_as_tree, :has_closure_tree
+    # Only alias acts_as_tree if it's not already defined (to avoid conflicts with other gems)
+    alias acts_as_tree has_closure_tree unless method_defined?(:acts_as_tree)
   end
 end

@@ -5,6 +5,7 @@ pkg/
 rdoc/
 doc/
 *.sqlite3.db
+*.sqlite3
 *.log
 tmp/
 .DS_Store
@@ -13,4 +14,5 @@ tmp/
 *.lock
 .ruby-*
 *.iml
+.env
 coverage/

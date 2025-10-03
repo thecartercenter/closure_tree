@@ -1,30 +1,27 @@
+# frozen_string_literal: true
+
 require 'active_record'
+require 'zeitwerk'
+
+loader = Zeitwerk::Loader.for_gem
+loader.ignore("#{__dir__}/generators")
+loader.setup
 
 module ClosureTree
-  extend ActiveSupport::Autoload
-
-  autoload :HasClosureTree
-  autoload :HasClosureTreeRoot
-  autoload :Support
-  autoload :HierarchyMaintenance
-  autoload :Model
-  autoload :Finders
-  autoload :HashTree
-  autoload :Digraphs
-  autoload :DeterministicOrdering
-  autoload :NumericDeterministicOrdering
-  autoload :Configuration
-
   def self.configure
-    yield configuration
-  end
-
-  def self.configuration
-    @configuration ||= Configuration.new
+    if block_given?
+      # Create a temporary configuration object to capture deprecated settings
+      config = Configuration.new
+      yield config
+    else
+      ActiveSupport::Deprecation.new.warn(
+        'ClosureTree.configure is deprecated and will be removed in a future version. ' \
+        'Configuration is no longer needed.'
+      )
+    end
   end
 end
 
-ActiveSupport.on_load :active_record do
-  ActiveRecord::Base.send :extend, ClosureTree::HasClosureTree
-  ActiveRecord::Base.send :extend, ClosureTree::HasClosureTreeRoot
+ActiveSupport.on_load(:active_record) do
+  extend ClosureTree::HasClosureTree, ClosureTree::HasClosureTreeRoot
 end
